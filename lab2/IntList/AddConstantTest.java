@@ -6,6 +6,13 @@ import org.junit.Test;
 public class AddConstantTest {
 
     @Test
+    public void testAddConstantZero(){
+        IntList lst = IntList.of(1);
+        IntListExercises.addConstant(lst, 1);
+        assertEquals("2", lst.toString());
+    }
+
+    @Test
     public void testAddConstantOne() {
         IntList lst = IntList.of(1, 2, 3, 4, 5);
         IntListExercises.addConstant(lst, 1);
