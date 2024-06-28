@@ -58,7 +58,7 @@ public class Model extends Observable {
         return board.size();
     }
 
-    /** Return true iff the game is over (there are no moves, or
+    /** Return true if the game is over (there are no moves, or
      *  there is a tile with value 2048 on the board). */
     public boolean gameOver() {
         checkGameOver();
@@ -94,7 +94,7 @@ public class Model extends Observable {
         setChanged();
     }
 
-    /** Tilt the board toward SIDE. Return true iff this changes the board.
+    /** Tilt the board toward SIDE. Return true if this changes the board.
      *
      * 1. If two Tile objects are adjacent in the direction of motion and have
      *    the same value, they are merged into one Tile of twice the original
@@ -106,13 +106,50 @@ public class Model extends Observable {
      *    value, then the leading two tiles in the direction of motion merge,
      *    and the trailing tile does not.
      * */
+    private boolean colCheck(int col,Side side){
+        int direction=-1;
+        int star=board.size()-1;
+        int last_tile_row=3;
+        int last_tile_value=(board.tile(col,last_tile_row)==null)?0:board.tile(col,last_tile_row).value();
+        boolean changed=false;
+        for(int i=star+direction;i>=0;i+=direction){
+            Tile current_tile=board.tile(col,i);
+            if(current_tile!=null){
+                if(last_tile_value==0){
+                    board.move(col,last_tile_row,current_tile);
+                    last_tile_value=current_tile.value();
+                    changed=true;
+                }
+                else if(last_tile_value==current_tile.value()){
+                    board.move(col,last_tile_row,current_tile);
+                    score+=board.tile(col,last_tile_row).value();
+                    last_tile_row+=direction;
+                    last_tile_value=0;
+                    changed=true;
+                }
+                else {
+                    last_tile_row+=direction;
+                    board.move(col,last_tile_row,current_tile);
+                    last_tile_value=current_tile.value();
+                    changed=true;
+                }
+            }
+        }
+        return changed;
+    }
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
-
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        board.setViewingPerspective(side);
+        for(int i=0;i<board.size();i++){
+            if(colCheck(i,side)){
+                changed=true;
+            }
+        }
+        board.setViewingPerspective(Side.NORTH);
 
         checkGameOver();
         if (changed) {
@@ -138,7 +175,17 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
-        return false;
+        int side_length=b.size();
+        boolean emptied=false;
+        for (int i=0;i<side_length;i++){
+            for(int j=0;j<side_length;j++){
+                if(b.tile(i,j)==null){
+                    emptied=true;
+                    break;
+                }
+            }
+        }
+        return emptied;
     }
 
     /**
@@ -148,7 +195,18 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
-        return false;
+        int side_length=b.size();
+        boolean max_piece_appear=false;
+        for (int i=0;i<side_length;i++){
+            for(int j=0;j<side_length;j++){
+                Tile current_tile=b.tile(i,j);
+                if(current_tile!=null && current_tile.value()==MAX_PIECE){
+                    max_piece_appear=true;
+                    break;
+                }
+            }
+        }
+        return max_piece_appear;
     }
 
     /**
@@ -159,6 +217,72 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        if(emptySpaceExists(b)){return true;}
+        int side_length=b.size();
+        for(int i=0;i<side_length;i++){
+            for(int j=0;j<side_length;j++){
+                if(adjacentTilesSameValue(b,i,j)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns whether there are two adjacent tiles with the same value.
+     */
+    private static boolean adjacentTilesSameValue(Board b,int col,int row){
+        int side_length=b.size();
+        int tile_value=b.tile(col,row).value();
+        // Search right horizontally
+        for (int i=col+1;i<side_length;i++){
+            Tile current_tile=b.tile(i,row);
+            if(current_tile!=null){
+                if(current_tile.value()==tile_value){
+                    return true;
+                }
+                else {
+                    break;
+                }
+            }
+        }
+        // Search left horizontally
+        for (int i=col-1;i>0;i--){
+            Tile current_tile=b.tile(i,row);
+            if(current_tile!=null){
+                if(current_tile.value()==tile_value){
+                    return true;
+                }
+                else {
+                    break;
+                }
+            }
+        }
+        // Search vertically upwards
+        for (int i=row+1;i<side_length;i++){
+            Tile current_tile=b.tile(col,i);
+            if(current_tile!=null){
+                if(current_tile.value()==tile_value){
+                    return true;
+                }
+                else {
+                    break;
+                }
+            }
+        }
+        // Search vertically downward
+        for (int i=row-1;i>0;i--){
+            Tile current_tile=b.tile(col,i);
+            if(current_tile!=null){
+                if(current_tile.value()==tile_value){
+                    return true;
+                }
+                else {
+                    break;
+                }
+            }
+        }
         return false;
     }
 
