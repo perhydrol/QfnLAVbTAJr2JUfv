@@ -8,6 +8,18 @@ import java.util.LinkedList;
 import static org.junit.Assert.*;
 
 public class ArrayDequeTest {
+
+    @Test
+    public void equalTest() {
+        ArrayDeque<Integer> one = new ArrayDeque<>();
+        ArrayDeque<Integer> two = new ArrayDeque<>();
+        for (int i = 0; i < 100; i++) {
+            one.addLast(i);
+            two.addLast(i);
+        }
+        assertTrue(one.equals(two));
+    }
+
     @Test
     public void printTest() {
         ArrayDeque<Integer> test = new ArrayDeque<>();

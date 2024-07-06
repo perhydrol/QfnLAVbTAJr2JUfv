@@ -9,6 +9,18 @@ import static org.junit.Assert.assertTrue;
 
 public class MaxArraydequeTest {
     @Test
+    public void equalTest() {
+        ArrayDeque<Integer> one = new ArrayDeque<>();
+        LinkedListDeque<Integer> two = new LinkedListDeque<>();
+        for (int i = 0; i < 100; i++) {
+            one.addLast(i);
+            two.addLast(i);
+        }
+        assertTrue(one.equals(two));
+        assertTrue(two.equals(one));
+    }
+
+    @Test
     public void biggestIntTest() {
         MaxArrayDeque<Integer> lld1 = new MaxArrayDeque<>(new IntComparator());
         for (int i = 0; i < 10; i++) {

@@ -22,11 +22,11 @@ public class ArrayDeque<T> implements Iterable<T>,Deque<T> {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof ArrayDeque)) {
+        if (!(o instanceof Deque)) {
             return false;
         }
         for (int i = 0; i < size; i++) {
-            if (!get(i).equals(((ArrayDeque<?>) o).get(i))) {
+            if (!get(i).equals(((Deque<?>) o).get(i))) {
                 return false;
             }
         }

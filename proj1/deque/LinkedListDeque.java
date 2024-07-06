@@ -18,11 +18,11 @@ public class LinkedListDeque<T> implements Deque<T>,Iterable<T> {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof LinkedListDeque)) {
+        if (!(o instanceof Deque)) {
             return false;
         }
         for (int i = 0; i < size; i++) {
-            if (!get(i).equals(((LinkedListDeque<?>) o).get(i))) {
+            if (!get(i).equals(((Deque<?>) o).get(i))) {
                 return false;
             }
         }
