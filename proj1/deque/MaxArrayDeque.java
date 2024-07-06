@@ -17,12 +17,12 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> {
         if (size() == 0) {
             return null;
         }
-        T max_value = this.get(0);
-        for (int i=0;i<size();i++) {
-            if (c.compare(get(i), max_value) > 0) {
-                max_value = get(i);
+        T maxValue = this.get(0);
+        for (int i = 0; i < size(); i++) {
+            if (c.compare(get(i), maxValue) > 0) {
+                maxValue = get(i);
             }
         }
-        return max_value;
+        return maxValue;
     }
 }

@@ -12,6 +12,41 @@ import static org.junit.Assert.*;
  * Performs some basic linked list tests.
  */
 public class LinkedListDequeTest {
+    @Test
+    public void equalTest() {
+        LinkedListDeque<Integer> one = new LinkedListDeque<>();
+        LinkedListDeque<Integer> two = new LinkedListDeque<>();
+        for (int i = 0; i < 100; i++) {
+            one.addLast(i);
+            two.addLast(i);
+        }
+        assertTrue(one.equals(two));
+    }
+
+    @Test
+    public void equalValueTest() {
+        LinkedListDeque<Integer> one = new LinkedListDeque<>();
+        LinkedListDeque<Integer> two = new LinkedListDeque<>();
+        for (int i = 0; i < 100; i++) {
+            int r = StdRandom.uniform(0, 100);
+            one.addLast(r);
+            two.addLast(i);
+        }
+        assertFalse(one.equals(two));
+    }
+
+    @Test
+    public void equalSizeTest() {
+        LinkedListDeque<Integer> one = new LinkedListDeque<>();
+        LinkedListDeque<Integer> two = new LinkedListDeque<>();
+        for (int i = 0; i < 10; i++) {
+            int r = StdRandom.uniform(0, 100);
+            one.addLast(r);
+            two.addLast(i);
+        }
+        two.addLast(10);
+        assertFalse(one.equals(two));
+    }
 
     @Test
     /* Adds a few things to the list, checking isEmpty() and size() are correct,

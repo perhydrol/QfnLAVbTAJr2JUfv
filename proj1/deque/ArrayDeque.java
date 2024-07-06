@@ -22,7 +22,7 @@ public class ArrayDeque<T> implements Iterable<T>,Deque<T> {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof Deque)) {
+        if (!(o instanceof Deque) || ((Deque<?>) o).size()!=size) {
             return false;
         }
         for (int i = 0; i < size; i++) {
@@ -44,7 +44,7 @@ public class ArrayDeque<T> implements Iterable<T>,Deque<T> {
         return temp;
     }
 
-    private int go_ahead(int point) {
+    private int goAhead(int point) {
         if ((point - 1) >= 0) {
             return point - 1;
         } else {
@@ -52,7 +52,7 @@ public class ArrayDeque<T> implements Iterable<T>,Deque<T> {
         }
     }
 
-    private int go_back(int point) {
+    private int goBack(int point) {
         if ((point + 1) < length) {
             return point + 1;
         } else {
@@ -64,7 +64,7 @@ public class ArrayDeque<T> implements Iterable<T>,Deque<T> {
         T[] temp = (T[]) new Object[capacity];
         int point = begin;
         for (int i = 0; i < size; i++) {
-            point = go_back(point);
+            point = goBack(point);
             temp[i] = item[point];
         }
         item = temp;
@@ -75,21 +75,21 @@ public class ArrayDeque<T> implements Iterable<T>,Deque<T> {
 
     @Override
     public void addFirst(T value) {
-        if ((size + 1) >= length || go_ahead(begin) == end) {
+        if ((size + 1) >= length || goAhead(begin) == end) {
             resize((size + 1) * 2);
         }
         item[begin] = value;
-        begin = go_ahead(begin);
+        begin = goAhead(begin);
         size++;
     }
 
     @Override
     public void addLast(T value) {
-        if ((size + 1) >= length || go_back(end) == begin) {
+        if ((size + 1) >= length || goBack(end) == begin) {
             resize((size + 1) * 2);
         }
         item[end] = value;
-        end = go_back(end);
+        end = goBack(end);
         size++;
     }
 
@@ -111,15 +111,15 @@ public class ArrayDeque<T> implements Iterable<T>,Deque<T> {
         if (size != 0 && (double) size / length < 0.25) {
             resize(size * 2);
         }
-        int first_index = go_back(begin);
-        T first_value = item[first_index];
-        if (first_value == null) {
+        int firstIndex = goBack(begin);
+        T firstValue = item[firstIndex];
+        if (firstValue == null) {
             return null;
         } else {
-            item[first_index] = null;
-            begin = first_index;
+            item[firstIndex] = null;
+            begin = firstIndex;
             size--;
-            return first_value;
+            return firstValue;
         }
     }
 
@@ -128,14 +128,14 @@ public class ArrayDeque<T> implements Iterable<T>,Deque<T> {
         if (size != 0 && (double) size / length < 0.25) {
             resize(size * 2);
         }
-        end = go_ahead(end);
-        T last_value = item[end];
-        if (last_value == null) {
+        end = goAhead(end);
+        T lastValue = item[end];
+        if (lastValue == null) {
             return null;
         } else {
             item[end] = null;
             size--;
-            return last_value;
+            return lastValue;
         }
     }
 

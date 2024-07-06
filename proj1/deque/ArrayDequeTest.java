@@ -21,6 +21,31 @@ public class ArrayDequeTest {
     }
 
     @Test
+    public void equalValueTest() {
+        ArrayDeque<Integer> one = new ArrayDeque<>();
+        ArrayDeque<Integer> two = new ArrayDeque<>();
+        for (int i = 0; i < 100; i++) {
+            int r=StdRandom.uniform(0, 100);
+            one.addLast(r);
+            two.addLast(i);
+        }
+        assertFalse(one.equals(two));
+    }
+
+    @Test
+    public void equalSizeTest() {
+        ArrayDeque<Integer> one = new ArrayDeque<>();
+        ArrayDeque<Integer> two = new ArrayDeque<>();
+        for (int i = 0; i < 10; i++) {
+            int r=StdRandom.uniform(0, 100);
+            one.addLast(r);
+            two.addLast(i);
+        }
+        two.addLast(10);
+        assertFalse(one.equals(two));
+    }
+
+    @Test
     public void printTest() {
         ArrayDeque<Integer> test = new ArrayDeque<>();
         for (int i = 0; i < 20; i++) {
