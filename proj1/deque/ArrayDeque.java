@@ -2,7 +2,7 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Iterable<T> {
+public class ArrayDeque<T> implements Deque<T> {
     private T[] item;
     private int size;
     private int length;
@@ -19,6 +19,18 @@ public class ArrayDeque<T> implements Iterable<T> {
 
     public Iterator<T> iterator() {
         return new MyIterator();
+    }
+
+    public boolean equals(Object o) {
+        if (!(o instanceof ArrayDeque)) {
+            return false;
+        }
+        for (int i = 0; i < size; i++) {
+            if (!get(i).equals(((ArrayDeque<?>) o).get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private int index(int x) {
@@ -61,6 +73,7 @@ public class ArrayDeque<T> implements Iterable<T> {
         end = size;
     }
 
+    @Override
     public void addFirst(T value) {
         if ((size + 1) >= length || go_ahead(begin) == end) {
             resize((size + 1) * 2);
@@ -70,6 +83,7 @@ public class ArrayDeque<T> implements Iterable<T> {
         size++;
     }
 
+    @Override
     public void addLast(T value) {
         if ((size + 1) >= length || go_back(end) == begin) {
             resize((size + 1) * 2);
@@ -79,14 +93,12 @@ public class ArrayDeque<T> implements Iterable<T> {
         size++;
     }
 
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
+    @Override
     public int size() {
         return size;
     }
 
+    @Override
     public void printDeque() {
         for (int i = 0; i < size; i++) {
             System.out.print(get(i) + " ");
@@ -94,6 +106,7 @@ public class ArrayDeque<T> implements Iterable<T> {
         System.out.println();
     }
 
+    @Override
     public T removeFirst() {
         if (size != 0 && (double) size / length < 0.25) {
             resize(size * 2);
@@ -110,6 +123,7 @@ public class ArrayDeque<T> implements Iterable<T> {
         }
     }
 
+    @Override
     public T removeLast() {
         if (size != 0 && (double) size / length < 0.25) {
             resize(size * 2);
@@ -125,6 +139,7 @@ public class ArrayDeque<T> implements Iterable<T> {
         }
     }
 
+    @Override
     public T get(int point) {
         point = index(point);
         return (point == -1) ? null : item[point];
@@ -133,10 +148,12 @@ public class ArrayDeque<T> implements Iterable<T> {
     private class MyIterator implements Iterator<T> {
         int point = 0;
 
+        @Override
         public boolean hasNext() {
             return point < size;
         }
 
+        @Override
         public T next() {
             if (hasNext()) {
                 T value = get(point);

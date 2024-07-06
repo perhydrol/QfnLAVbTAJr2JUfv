@@ -124,7 +124,7 @@ public class LinkedListDequeTest {
     public void randomlyAddAndRemoveTests() {
         LinkedList<Integer> temp = new LinkedList<>();
         LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10000; i++) {
             int operationNumber = StdRandom.uniform(0, 5);
             switch (operationNumber) {
                 case 1: {
