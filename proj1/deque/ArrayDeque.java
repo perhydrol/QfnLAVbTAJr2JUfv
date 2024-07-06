@@ -2,7 +2,7 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Iterable<T>,Deque<T> {
+public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
     private T[] item;
     private int size;
     private int length;
@@ -22,7 +22,7 @@ public class ArrayDeque<T> implements Iterable<T>,Deque<T> {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof Deque) || ((Deque<?>) o).size()!=size) {
+        if (!(o instanceof Deque) || ((Deque<?>) o).size() != size) {
             return false;
         }
         for (int i = 0; i < size; i++) {
