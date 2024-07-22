@@ -14,7 +14,7 @@ import java.io.InputStream;
  */
 public class GuitarPlayer {
     private Sequence sequence = null;
-    private Harp[] strings;
+    private GuitarString[] strings;
     private double[] vol;
 
     public GuitarPlayer(InputStream source) {
@@ -34,10 +34,10 @@ public class GuitarPlayer {
     }
 
     private void initialize() {
-        strings = new Harp[128];
+        strings = new GuitarString[128];
         vol = new double[128];
         for (int i = 0; i < strings.length; i++) {
-            strings[i] = new Harp(440.0 * Math.pow(2.0, (i - 69.0) / 12.0));
+            strings[i] = new GuitarString(440.0 * Math.pow(2.0, (i - 69.0) / 12.0));
             vol[i] = 0.0;
         }
     }
