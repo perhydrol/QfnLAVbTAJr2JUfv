@@ -7,7 +7,7 @@ import java.util.Collection;
  * Hash Table with buckets that are Hash Sets (trippy!)
  * @author Neil Kulkarni
  */
-public class MyHashMapHSBuckets<K, V> extends MyHashMap<K, V> {
+public class MyHashMapHSBuckets<K extends Comparable<K>, V> extends MyHashMap<K, V> {
 
     /**
      * Constructor that creates a backing array with default
