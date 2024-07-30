@@ -125,12 +125,21 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     @Override
     public V remove(K key) {
-        throw new UnsupportedOperationException();
+        int hashCode = getHashCode(key, bucketsCount);
+        Iterator<Node> point = buckets[hashCode].iterator();
+        while (point.hasNext()) {
+            Node temp = point.next();
+            if (temp.key.equals(key)) {
+                point.remove();
+                return temp.value;
+            }
+        }
+        return null;
     }
 
     @Override
     public V remove(K key, V value) {
-        throw new UnsupportedOperationException();
+        return remove(key);
     }
 
     @Override
