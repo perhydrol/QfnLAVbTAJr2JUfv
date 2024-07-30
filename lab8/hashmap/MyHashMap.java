@@ -10,7 +10,7 @@ import java.util.*;
  *
  * @author YOUR NAME HERE
  */
-public class MyHashMap<K extends Comparable<K>, V> implements Map61B<K, V> {
+public class MyHashMap<K, V> implements Map61B<K, V> {
 
     /* Instance Variables */
     private Collection<Node>[] buckets;
@@ -64,8 +64,7 @@ public class MyHashMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     public V get(K key) {
         int hashCode = getHashCode(key, bucketsCount);
         for (Node current : buckets[hashCode]) {
-            int cmp = current.key.compareTo(key);
-            if (cmp == 0) {
+            if (current.key.equals(key)) {
                 return current.value;
             }
         }
@@ -91,8 +90,7 @@ public class MyHashMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     private Node getNodeInCollection(K key, Collection<Node> list) {
         for (Node temp : list) {
-            int cmp = temp.key.compareTo(key);
-            if (cmp == 0) {
+            if (temp.key.equals(key)) {
                 return temp;
             }
         }
