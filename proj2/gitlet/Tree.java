@@ -198,7 +198,7 @@ public class Tree implements Serializable {
                 if (subDir.equals(".gitlet")) {
                     continue;
                 }
-                Tree subDirTree = new Tree(subDir, entry);
+                Tree subDirTree = new Tree(path + System.getProperty("file.separator") + subDir, entry);
                 subDirTree.saveTree();
                 this.subDirs.put(subDir, subDirTree.SHA);
             }
@@ -216,11 +216,12 @@ public class Tree implements Serializable {
             if (files.values().isEmpty() && subDirs.values().isEmpty()) {
                 SHA = Utils.sha1("There is no thing");
             } else if (files.values().isEmpty()) {
-                SHA = Utils.sha1(subDirs.values());
+                SHA = Utils.sha1(String.join(";", subDirs.values()));
             } else if (subDirs.values().isEmpty()) {
-                SHA = Utils.sha1(files.values());
+                //System.out.println(files.values());
+                SHA = Utils.sha1(String.join(";", files.values()));
             } else {
-                SHA = Utils.sha1(files.values(), subDirs.values());
+                SHA = Utils.sha1(String.join(";", files.values()), String.join(";", subDirs.values()));
             }
         }
         return SHA;

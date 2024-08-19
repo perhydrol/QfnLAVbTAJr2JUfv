@@ -3,6 +3,7 @@ package gitlet;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -76,7 +77,7 @@ public class Main {
     private static void initClass() {
         Tree emptyTree = new Tree(null);
         emptyTree.saveTree();
-        Commit initCommit = new Commit("Init commit", emptyTree.getSHA(), "");
+        Commit initCommit = new Commit("initial commit", emptyTree.getSHA(), "");
         initCommit.saveCommit();
         Branch master = new Branch("master", initCommit.getSHA());
         master.saveBranch();
@@ -86,6 +87,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        //args=new String[]{"checkout","fb67e899","--","gitlet-design.md"};
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;

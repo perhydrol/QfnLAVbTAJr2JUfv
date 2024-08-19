@@ -93,7 +93,7 @@ public class Commit implements Serializable {
      * @return The Commit object corresponding to the given short SHA-1 hash, or null if not found.
      */
     public static Commit fromFileShortSHA(String SHA) {
-        File dir = Utils.join(Repository.OBJECTS_DIR, SHA.substring(0, 3));
+        File dir = Utils.join(Repository.OBJECTS_DIR, SHA.substring(0, 2));
         if (dir.exists()) {
             List<String> files = Utils.plainFilenamesIn(dir);
             if (files != null) {

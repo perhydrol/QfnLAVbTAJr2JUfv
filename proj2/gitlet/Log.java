@@ -21,6 +21,7 @@ public class Log {
         }
         System.out.println(Repository.timeFormat(curCommit.getTime()));
         System.out.println(curCommit.getMessage());
+        System.out.println("");
     }
 
     public void printLog() {
