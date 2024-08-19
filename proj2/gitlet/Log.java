@@ -53,14 +53,17 @@ public class Log {
     public void find(String message) {
         String commitContent = Utils.readContentsAsString(Repository.COMMIT_LOG);
         String[] eachLine = commitContent.split("\\r?\\n");
+        boolean flag = false;
         for (String s : eachLine) {
             String[] line = s.split(";");
             if (line[1].equals(message)) {
                 Commit temp = Commit.fromFile(line[0]);
                 printCommit(temp);
-                return;
+                flag = true;
             }
         }
-        System.out.println("Found no commit with that message.");
+        if (!flag) {
+            System.out.println("Found no commit with that message.");
+        }
     }
 }

@@ -116,7 +116,7 @@ public class Tree implements Serializable {
         }
         HashMap<String, String> curFiles = curTree.getFiles();
         HashMap<String, String> targetFiles = targetTree.getFiles();
-        Set<String> untrackedFiles = targetFiles.keySet();
+        Set<String> untrackedFiles = new HashSet<>(targetFiles.keySet());
         untrackedFiles.removeAll(curFiles.keySet());
         if (!untrackedFiles.isEmpty()) {
             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");

@@ -87,7 +87,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        //args=new String[]{"checkout","master"};
+        //args=new String[]{"reset","499688e641bcb1b69a94fee8fc68bdea"};
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;
@@ -154,7 +154,6 @@ public class Main {
                     break;
                 }
                 String m = args[1];
-                // String m = "test";
                 if (Repository.GITLET_DIR.exists()) {
                     Head head = Head.fromFile();
                     Log log = new Log(head.getCurrentCommitSHA(), head);

@@ -185,6 +185,8 @@ public class Commit implements Serializable {
                 Blob blob = Blob.fromFile(blobSHA);
                 blob.recovery();
                 return true;
+            } else {
+                System.out.println("File does not exist in that commit.");
             }
         } catch (Exception e) {
             // Handle exceptions related to file recovery.
