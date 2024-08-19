@@ -3,7 +3,6 @@ package gitlet;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -75,7 +74,7 @@ public class Main {
      * Creates an empty tree, initial commit, and master branch.
      */
     private static void initClass() {
-        Tree emptyTree = new Tree(null, new HashMap<>());
+        Tree emptyTree = new Tree(null);
         emptyTree.saveTree();
         Commit initCommit = new Commit("Init commit", emptyTree.getSHA(), "");
         initCommit.saveCommit();
