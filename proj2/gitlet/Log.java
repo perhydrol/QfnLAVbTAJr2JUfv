@@ -34,7 +34,9 @@ public class Log {
             }
             Commit curCommit = Commit.fromFile(cur);
             printCommit(curCommit);
-            parentList.addLast(curCommit.getParentSHAs().get(0));
+            if (!cur.equals(currentHead.getCurrentBranch().getSTAR_COMMIT_SHA())) {
+                parentList.addLast(curCommit.getParentSHAs().get(0));
+            }
         }
     }
 

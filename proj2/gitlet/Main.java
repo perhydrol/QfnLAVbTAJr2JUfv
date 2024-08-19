@@ -78,6 +78,7 @@ public class Main {
         emptyTree.saveTree();
         Commit initCommit = new Commit("initial commit", emptyTree.getSHA(), "");
         initCommit.saveCommit();
+        appendLineToCommitLog(initCommit.getSHA() + ";" + "initial commit");
         Branch master = new Branch("master", initCommit.getSHA());
         master.saveBranch();
         Head head = new Head(initCommit.getSHA(), master.getName());
@@ -86,7 +87,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        //args=new String[]{"rm","gitlet-design.md"};
+        //args=new String[]{"checkout","master"};
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;
@@ -219,6 +220,8 @@ public class Main {
                             try {
                                 Branch branch = Branch.fromFile(s);
                                 Tree.checkout(curTree, branch.getTree());
+                                head.setCurrentCommitSHA(branch.getCurrentCommitSHA());
+                                head.setCurrentBranch(branch);
                             } catch (RuntimeException e) {
                                 System.out.println("No such branch exists.");
                                 System.exit(0);

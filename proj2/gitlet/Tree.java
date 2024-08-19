@@ -3,6 +3,7 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -81,14 +82,14 @@ public class Tree implements Serializable {
         }
         HashMap<String, String> curFiles = curTree.getFiles();
         HashMap<String, String> targetFiles = targetTree.getFiles();
-        Set<String> delFiles = curFiles.keySet();
+        Set<String> delFiles = new HashSet<>(curFiles.keySet());
         delFiles.removeAll(targetFiles.keySet());
         for (String s : delFiles) {
             File path = Repository.StringToFile(s);
             Utils.restrictedDelete(path);
         }
         for (String s : targetFiles.keySet()) {
-            if (!curFiles.get(s).equals(targetFiles.get(s))) {
+            if (!targetFiles.get(s).equals(curFiles.get(s))) {
                 Blob fileBlob = Blob.fromFile(targetFiles.get(s));
                 fileBlob.recovery();
             }

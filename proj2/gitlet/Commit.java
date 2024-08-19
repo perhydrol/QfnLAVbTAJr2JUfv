@@ -51,7 +51,11 @@ public class Commit implements Serializable {
      * @param parentSHA The SHA-1 hash of the parent commit (can be null for root commits).
      */
     public Commit(String message, String treeSHA, String parentSHA) {
-        this.time = System.currentTimeMillis();
+        if (parentSHA.isEmpty()) {
+            this.time = 0; // Unix Epoch time
+        } else {
+            this.time = System.currentTimeMillis();
+        }
         this.message = message;
         this.treeSHA = treeSHA;
         this.parentSHAs = new ArrayList<>();

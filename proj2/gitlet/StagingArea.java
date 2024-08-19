@@ -40,8 +40,8 @@ public class StagingArea {
     public void printStaging() {
         Deque<String> staged = new ArrayDeque<>();
         List<String> removed = new ArrayList<>();
-        Set<String> notStaged = stagingArea.getEntry().keySet();
-        Set<String> tracked = stagingArea.getEntry().keySet();
+        Set<String> notStaged = new HashSet<>(stagingArea.getEntry().keySet());
+        Set<String> tracked = new HashSet<>(stagingArea.getEntry().keySet());
         for (String s : trackedFiles.keySet()) {
             int ans = trackedFiles.get(s);
             if (ans > 0) {
@@ -88,6 +88,10 @@ public class StagingArea {
      * @return true if the file was added to the staging area, false if it was identical to the current commit's version.
      */
     public boolean add(String filePath) {
+        if(!Repository.StringToFile(filePath).exists()){
+            System.out.println("File does not exist.");
+            return false;
+        }
         String curSHA = Repository.getFileSHA(filePath);
         String preSHA = this.tree.getFileSHA(filePath);
         if (preSHA == null || !preSHA.equals(curSHA)) {
