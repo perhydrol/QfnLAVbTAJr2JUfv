@@ -107,6 +107,6 @@ public class Index implements Serializable {
     }
 
     public HashMap<String, String> getEntry() {
-        return entry;
+        return new HashMap<>(entry);
     }
 }

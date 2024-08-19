@@ -52,7 +52,7 @@ public class Branch implements Serializable {
     }
 
     public static void merge(Branch current, Branch target) {
-        Commit splitPoint=Commit.getSplitPoint(current.STAR_COMMIT_SHA,target.STAR_COMMIT_SHA);
+        Commit splitPoint = Commit.getSplitPoint(current.STAR_COMMIT_SHA, target.STAR_COMMIT_SHA);
     }
 
     public static void merge(String current, String target) {

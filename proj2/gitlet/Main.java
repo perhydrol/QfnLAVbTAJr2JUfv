@@ -87,7 +87,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        //args=new String[]{"reset","499688e641bcb1b69a94fee8fc68bdea"};
+        //args=new String[]{"rm","tt.txt"};
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;
