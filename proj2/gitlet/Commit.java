@@ -2,25 +2,195 @@ package gitlet;
 
 // TODO: any imports you need here
 
-import java.util.Date; // TODO: You'll likely use this in this class
+import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-/** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
+/**
+ * Represents a Gitlet commit object.
+ * <p>
+ * A Commit object records the state of a repository at a given time.
+ * Each commit has a message describing the changes made, a reference to a tree object that
+ * represents the file system snapshot, a reference to the parent commit (if any),
+ * and a timestamp. The Commit object is also identified by a unique SHA-1 hash.
+ * <p>
+ * Commits are stored in a version control system to track the history of a project.
+ * This class provides methods for creating a commit, saving it to persistent storage,
+ * and retrieving it from storage.
  *
- *  @author TODO
+ * @author TODO
  */
-public class Commit {
+public class Commit implements Serializable {
+
     /**
-     * TODO: add instance variables here.
-     *
-     * List all instance variables of the Commit class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided one example for `message`.
+     * The message of this Commit.
      */
+    private final String message;
+    /**
+     * The SHA-1 hash of the tree object associated with this commit,
+     * which represents the file system state at the time of this commit.
+     */
+    private final String treeSHA;
+    /**
+     * The SHA-1 hash of the parent commits. The list may contain one or more SHA-1 hashes.
+     * If this commit is the root commit, the list will be empty.
+     */
+    private final List<String> parentSHAs;
+    /**
+     * The timestamp of this commit in milliseconds since the Unix epoch.
+     */
+    private final long time;
+    private final String SHA;
 
-    /** The message of this Commit. */
-    private String message;
+    /**
+     * Constructs a new Commit object with the specified message, tree SHA, and parent SHA.
+     *
+     * @param message   The commit message.
+     * @param treeSHA   The SHA-1 hash of the associated tree object.
+     * @param parentSHA The SHA-1 hash of the parent commit (can be null for root commits).
+     */
+    public Commit(String message, String treeSHA, String parentSHA) {
+        this.time = System.currentTimeMillis();
+        this.message = message;
+        this.treeSHA = treeSHA;
+        this.parentSHAs = new ArrayList<>();
+        this.parentSHAs.add(parentSHA);
+        this.SHA = Utils.sha1(message, treeSHA, parentSHA);
+    }
 
-    /* TODO: fill in the rest of this class. */
+    /**
+     * Constructs a new Commit object with the specified message, tree SHA, and a list of parent SHAs.
+     *
+     * @param message    The commit message.
+     * @param treeSHA    The SHA-1 hash of the associated tree object.
+     * @param parentSHAs The list of SHA-1 hashes of parent commits.
+     */
+    public Commit(String message, String treeSHA, List<String> parentSHAs) {
+        this.time = System.currentTimeMillis();
+        this.message = message;
+        this.treeSHA = treeSHA;
+        this.parentSHAs = parentSHAs;
+        this.SHA = Utils.sha1(message, treeSHA, parentSHAs);
+    }
+
+    /**
+     * Loads a Commit object from the filesystem based on its SHA-1 hash.
+     *
+     * @param SHA The SHA-1 hash of the commit to load.
+     * @return The Commit object corresponding to the given SHA-1 hash.
+     * @throws RuntimeException if the commit file does not exist or cannot be read.
+     */
+    public static Commit fromFile(String SHA) {
+        return Repository.fromSHAFile(SHA, Commit.class);
+    }
+
+    /**
+     * Loads a Commit object from the filesystem based on a short SHA-1 hash.
+     * This method searches the appropriate directory for the full SHA-1 hash.
+     *
+     * @param SHA The short SHA-1 hash of the commit to load.
+     * @return The Commit object corresponding to the given short SHA-1 hash, or null if not found.
+     */
+    public static Commit fromFileShortSHA(String SHA) {
+        File dir = Utils.join(Repository.OBJECTS_DIR, SHA.substring(0, 3));
+        if (dir.exists()) {
+            List<String> files = Utils.plainFilenamesIn(dir);
+            if (files != null) {
+                for (String i : files) {
+                    if (SHA.equals(i.substring(0, SHA.length()))) {
+                        return fromFile(i);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static boolean isRoot(Commit a) {
+        return a.message.equals("Init commit") &&
+                (a.parentSHAs == null || a.parentSHAs.isEmpty() || a.parentSHAs.get(0) == null);
+    }
+
+    public static Commit getSplitPoint(Commit a, Commit b) {
+        if (a.SHA.equals(b.SHA)) {
+            return a;
+        }
+        for (String curA : a.parentSHAs) {
+            for (String curB : b.parentSHAs) {
+                Commit ret = getSplitPoint(curA, curB);
+                if (ret != null) {
+                    return ret;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static Commit getSplitPoint(String a, String b) {
+        Commit curACommit = fromFile(a);
+        Commit curBCommit = fromFile(b);
+        return getSplitPoint(curACommit, curBCommit);
+    }
+
+    public boolean isRoot() {
+        return isRoot(this);
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getTreeSHA() {
+        return treeSHA;
+    }
+
+    public List<String> getParentSHAs() {
+        return new ArrayList<>(parentSHAs);
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public String getSHA() {
+        return SHA;
+    }
+
+    /**
+     * Saves the current Commit object by serializing it and storing it using its SHA-1 hash as the filename.
+     *
+     * @throws RuntimeException if there is an issue saving the commit file.
+     */
+    public void saveCommit() {
+        Repository.saveSHAFile(SHA, this);
+    }
+
+    /**
+     * Recovers a file from the commit's tree based on the given file path.
+     *
+     * @param filePath The relative path of the file to recover.
+     * @return true if the file was successfully recovered, false otherwise.
+     */
+    public boolean recoveryFile(String filePath) {
+        filePath = Repository.toRelativePath(filePath);
+        try {
+            Tree tree = Tree.fromFile(treeSHA);
+            String blobSHA = tree.getFileSHA(filePath);
+            if (blobSHA != null) {
+                Blob blob = Blob.fromFile(blobSHA);
+                blob.recovery();
+                return true;
+            }
+        } catch (Exception e) {
+            // Handle exceptions related to file recovery.
+            System.err.println("Error recovering file: " + e.getMessage());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return SHA.hashCode();
+    }
 }
