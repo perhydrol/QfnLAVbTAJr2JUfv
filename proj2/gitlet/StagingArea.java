@@ -38,29 +38,29 @@ public class StagingArea {
      * Prints the status of the staging area, including staged, removed, and not staged files.
      */
     public void printStaging() {
-        List<String> staged = new ArrayList<>();
+        Deque<String> staged = new ArrayDeque<>();
         List<String> removed = new ArrayList<>();
         Set<String> notStaged = stagingArea.getEntry().keySet();
         Set<String> tracked = stagingArea.getEntry().keySet();
         for (String s : trackedFiles.keySet()) {
             int ans = trackedFiles.get(s);
             if (ans > 0) {
-                staged.add(s);
+                staged.addFirst(s);
                 notStaged.remove(s);
             } else if (ans < 0) {
                 removed.add(s);
                 notStaged.remove(s);
             }
         }
-        System.out.println("\n\n=== Staged Files ===");
+        System.out.println("\n=== Staged Files ===");
         for (String s : staged) {
             System.out.println(s);
         }
-        System.out.println("\n\n=== Removed Files ===");
+        System.out.println("\n=== Removed Files ===");
         for (String s : removed) {
             System.out.println(s);
         }
-        System.out.println("\n\n=== Modifications Not Staged For Commit ===");
+        System.out.println("\n=== Modifications Not Staged For Commit ===");
         for (String s : notStaged) {
             String SHA;
             try {
@@ -73,7 +73,7 @@ public class StagingArea {
                 System.out.println(s + "(modified)");
             }
         }
-        System.out.println("\n\n=== Untracked Files ===");
+        System.out.println("\n=== Untracked Files ===");
         HashSet<String> allFiles = Repository.getAllFilesInSubdirectories(Repository.CWD.toString());
         allFiles.removeAll(tracked);
         for (String s : allFiles) {
@@ -131,18 +131,7 @@ public class StagingArea {
      * @return true if the file was successfully removed, false if it was neither staged nor tracked.
      */
     public boolean rm(String filePath) {
-        String curSHA = Repository.getFileSHA(filePath);
-        String preSHA = this.tree.getFileSHA(filePath);
-        if (preSHA != null || stagingArea.getFileSHA(filePath) != null) {
-            stagingArea.remove(filePath);
-            Utils.restrictedDelete(filePath);
-            stagingArea.saveIndex();
-            trackedFiles.put(filePath, -1);
-            saveChanged();
-            return true;
-        } else {
-            return false;
-        }
+        return rm(Repository.StringToFile(filePath));
     }
 
     /**
@@ -152,7 +141,21 @@ public class StagingArea {
      * @return true if the file was successfully removed, false otherwise.
      */
     public boolean rm(File filePath) {
-        return rm(filePath.toString());
+        String curSHA = Repository.getFileSHA(filePath);
+        String preSHA = this.tree.getFileSHA(filePath);
+        if (preSHA != null || stagingArea.getFileSHA(filePath) != null) {
+            stagingArea.remove(filePath);
+            if (filePath.exists()) {
+                Utils.restrictedDelete(filePath);
+            }
+            stagingArea.saveIndex();
+            trackedFiles.put(filePath.toString(), -1);
+            saveChanged();
+            return true;
+        } else {
+            System.out.println("No reason to remove the file.");
+            return false;
+        }
     }
 
     /**
@@ -172,7 +175,7 @@ public class StagingArea {
         }
         Tree newTree = new Tree(Repository.CWD.toString(), stagingArea.getEntry());
         newTree.saveTree();
-        this.tree=newTree;
+        this.tree = newTree;
         Commit newCommit = new Commit(m, newTree.getSHA(), perCommit);
         newCommit.saveCommit();
         head.setCurrentCommitSHA(newCommit);

@@ -3,7 +3,6 @@ package gitlet;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -87,7 +86,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        //args=new String[]{"checkout","fb67e899","--","gitlet-design.md"};
+        args=new String[]{"rm","gitlet-design.md"};
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;
@@ -306,7 +305,14 @@ public class Main {
                     System.out.println("Not in an initialized Gitlet directory.");
                 }
                 break;
-            case "merge":
+            case "rm":
+                if (Repository.GITLET_DIR.exists()) {
+                    String filePath = args[1];
+                    StagingArea stagingArea = new StagingArea();
+                    stagingArea.rm(filePath);
+                } else {
+                    System.out.println("Not in an initialized Gitlet directory.");
+                }
                 break;
             default:
                 System.out.println("No command with that name exists.");

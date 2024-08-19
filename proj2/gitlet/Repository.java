@@ -3,7 +3,6 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.FileSystems;
 import java.util.*;
 
 import static gitlet.Utils.join;
@@ -232,7 +231,7 @@ public class Repository {
             if (s.equals(".gitlet")) {
                 continue;
             }
-            String path = dir + FileSystems.getDefault().getSeparator() + s;
+            String path = dir +  System.getProperty("file.separator") + s;
             filesSet.addAll(getAllFilesInSubdirectories(path));
         }
         return filesSet;
