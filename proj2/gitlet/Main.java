@@ -86,7 +86,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        args=new String[]{"rm","gitlet-design.md"};
+        //args=new String[]{"rm","gitlet-design.md"};
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;
