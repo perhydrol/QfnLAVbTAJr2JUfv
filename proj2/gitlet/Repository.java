@@ -223,7 +223,7 @@ public class Repository {
         HashSet<String> filesSet = new HashSet<>();
         if (files != null) {
             for (String s : files) {
-                filesSet.add(toRelativePath(dir + System.getProperty("file.separator") + s));
+                filesSet.add(toRelativePath(dir + File.separator + s));
             }
         }
         List<String> subDir = Utils.subdirectoriesIn(dir);
@@ -231,7 +231,7 @@ public class Repository {
             if (s.equals(".gitlet")) {
                 continue;
             }
-            String path = dir +  System.getProperty("file.separator") + s;
+            String path = dir + File.separator + s;
             filesSet.addAll(getAllFilesInSubdirectories(path));
         }
         return filesSet;

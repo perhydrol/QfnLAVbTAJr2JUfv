@@ -58,7 +58,7 @@ public class StagingArea {
         }
         System.out.println("\n=== Removed Files ===");
         for (String s : removed) {
-            System.out.println(s);
+            System.out.println(Repository.toRelativePath(s));
         }
         System.out.println("\n=== Modifications Not Staged For Commit ===");
         for (String s : notStaged) {
@@ -66,7 +66,7 @@ public class StagingArea {
             try {
                 SHA = Repository.getFileSHA(s);
             } catch (RuntimeException e) {
-                System.out.println(s + "(deleted)");
+                // System.out.println(s + "(deleted)");
                 continue;
             }
             if (!SHA.equals(stagingArea.getFileSHA(s))) {
