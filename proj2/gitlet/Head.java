@@ -13,16 +13,15 @@ public class Head {
     // File references to the HEAD and HEAD_LOG files in the repository.
     private static final File HEAD = Repository.HEAD;
     private static final File HEAD_LOG = Repository.HEAD_LOG;
-    // TODO: Add some function for HEAD_LOG
 
     private String currentCommitSHA;
     private String currentBranchName;
 
     /**
-     * Constructs a Head object with the specified commit SHA and branch SHA.
+     * Constructs a Head object with the specified commit sha and branch sha.
      *
-     * @param currentCommitSHA  The SHA-1 hash of the current commit.
-     * @param currentBranchName The SHA-1 hash of the current branch.
+     * @param currentCommitSHA  The sha-1 hash of the current commit.
+     * @param currentBranchName The sha-1 hash of the current branch.
      */
     public Head(String currentCommitSHA, String currentBranchName) {
         this.currentCommitSHA = currentCommitSHA;
@@ -32,7 +31,7 @@ public class Head {
     /**
      * Loads the Head object from the HEAD file.
      *
-     * @return A Head object initialized with the current commit and branch SHA-1 hashes.
+     * @return A Head object initialized with the current commit and branch sha-1 hashes.
      * @throws RuntimeException if the HEAD file does not exist or is unreadable.
      */
     public static Head fromFile() {
@@ -56,7 +55,7 @@ public class Head {
     /**
      * Retrieves the current branch as a Branch object.
      *
-     * @return The Branch object corresponding to the current branch SHA-1 hash.
+     * @return The Branch object corresponding to the current branch sha-1 hash.
      */
     public Branch getCurrentBranch() {
         return Branch.fromFile(currentBranchName);
@@ -72,9 +71,9 @@ public class Head {
     }
 
     /**
-     * Sets the current branch SHA-1 hash and updates the HEAD file.
+     * Sets the current branch sha-1 hash and updates the HEAD file.
      *
-     * @param currentBranchName The SHA-1 hash of the branch to set as current.
+     * @param currentBranchName The sha-1 hash of the branch to set as current.
      */
     public void setCurrentBranch(String currentBranchName) {
         this.currentBranchName = currentBranchName;
@@ -106,9 +105,9 @@ public class Head {
     }
 
     /**
-     * Sets the current commit SHA-1 hash and updates the HEAD file.
+     * Sets the current commit sha-1 hash and updates the HEAD file.
      *
-     * @param currentCommitSHA The SHA-1 hash of the commit to set as current.
+     * @param currentCommitSHA The sha-1 hash of the commit to set as current.
      */
     public void setCurrentCommitSHA(String currentCommitSHA) {
         this.currentCommitSHA = currentCommitSHA;

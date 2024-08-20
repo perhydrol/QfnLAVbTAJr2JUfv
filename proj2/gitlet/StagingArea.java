@@ -62,14 +62,14 @@ public class StagingArea {
         }
         System.out.println("\n=== Modifications Not Staged For Commit ===");
         for (String s : notStaged) {
-            String SHA;
+            String sha;
             try {
-                SHA = Repository.getFileSHA(s);
+                sha = Repository.getFileSHA(s);
             } catch (RuntimeException e) {
                 // System.out.println(s + "(deleted)");
                 continue;
             }
-            if (!SHA.equals(stagingArea.getFileSHA(s))) {
+            if (!sha.equals(stagingArea.getFileSHA(s))) {
                 System.out.println(s + "(modified)");
             }
         }
@@ -125,7 +125,8 @@ public class StagingArea {
      * @return true if the file was added to the staging area, false otherwise.
      */
     public boolean add(File filePath) {
-        return add(filePath.toString());
+        String relativeFilePath=Repository.toRelativePath(filePath.toString());
+        return add(relativeFilePath);
     }
 
     /**
@@ -147,13 +148,14 @@ public class StagingArea {
     public boolean rm(File filePath) {
         String curSHA = Repository.getFileSHA(filePath);
         String preSHA = this.tree.getFileSHA(filePath);
-        if (preSHA != null || stagingArea.getFileSHA(Repository.toRelativePath(filePath.toString())) != null) {
-            stagingArea.remove(filePath);
+        String relativeFilePath=Repository.toRelativePath(filePath.toString());
+        if (preSHA != null || stagingArea.getFileSHA(relativeFilePath) != null) {
+            stagingArea.remove(relativeFilePath);
             if (filePath.exists() && preSHA != null) {
                 Utils.restrictedDelete(filePath);
-                trackedFiles.put(filePath.toString(), -1);
+                trackedFiles.put(relativeFilePath, -1);
             } else {
-                trackedFiles.remove(filePath.toString());
+                trackedFiles.remove(relativeFilePath);
             }
             stagingArea.saveIndex();
             saveChanged();
@@ -168,7 +170,7 @@ public class StagingArea {
      * Generates a new commit with the specified message, based on the current staging area.
      *
      * @param m The commit message.
-     * @return The SHA-1 hash of the newly created commit.
+     * @return The sha-1 hash of the newly created commit.
      */
     public String genNewCommit(String m) {
         if (m.isEmpty()) {

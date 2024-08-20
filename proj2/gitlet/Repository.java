@@ -93,10 +93,10 @@ public class Repository {
 
 
     /**
-     * Generates the SHA-1 hash of a file's contents.
+     * Generates the sha-1 hash of a file's contents.
      *
-     * @param filePath The file whose SHA-1 hash is to be computed.
-     * @return The SHA-1 hash as a String.
+     * @param filePath The file whose sha-1 hash is to be computed.
+     * @return The sha-1 hash as a String.
      * @throws RuntimeException if the file is not writable or cannot be read.
      */
     public static String getFileSHA(File filePath) {
@@ -109,30 +109,30 @@ public class Repository {
     }
 
     /**
-     * Generates the SHA-1 hash of a file's contents, given the file path as a String.
+     * Generates the sha-1 hash of a file's contents, given the file path as a String.
      *
-     * @param filePath The path to the file whose SHA-1 hash is to be computed.
-     * @return The SHA-1 hash as a String.
+     * @param filePath The path to the file whose sha-1 hash is to be computed.
+     * @return The sha-1 hash as a String.
      */
     public static String getFileSHA(String filePath) {
         return getFileSHA(join(CWD, filePath));
     }
 
     /**
-     * Saves a serializable object to disk using its SHA-1 hash as the filename.
+     * Saves a serializable object to disk using its sha-1 hash as the filename.
      * The object is saved under a directory structure determined by the two ahead character
-     * of the SHA-1 hash to avoid storing too many files in a single directory.
+     * of the sha-1 hash to avoid storing too many files in a single directory.
      *
      * @param <T> The type of the object, which must implement Serializable.
-     * @param SHA The SHA-1 hash of the object, used as the filename.
+     * @param sha The sha-1 hash of the object, used as the filename.
      * @param obj The object to save.
      * @return true if the object was successfully saved.
      * @throws RuntimeException if an IOException occurs during file creation or writing.
      */
-    public static <T extends Serializable> boolean saveSHAFile(String SHA, T obj) {
-        String preTwo = SHA.substring(0, 2);
+    public static <T extends Serializable> boolean saveSHAFile(String sha, T obj) {
+        String preTwo = sha.substring(0, 2);
         File fileDir = Utils.join(Repository.OBJECTS_DIR, preTwo);
-        File file = Utils.join(fileDir, SHA);
+        File file = Utils.join(fileDir, sha);
         try {
             if (!fileDir.exists()) {
                 fileDir.mkdir();
@@ -145,23 +145,23 @@ public class Repository {
                 return false;
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save SHA file: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to save sha file: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Loads a serializable object from disk based on its SHA-1 hash.
+     * Loads a serializable object from disk based on its sha-1 hash.
      *
      * @param <T>  The type of the object to load.
-     * @param SHA  The SHA-1 hash of the object.
+     * @param sha  The sha-1 hash of the object.
      * @param type The class type of the object.
      * @return The loaded object.
      * @throws RuntimeException if an error occurs during loading.
      */
-    public static <T extends Serializable> T fromSHAFile(String SHA, Class<T> type) {
-        String preTwo = SHA.substring(0, 2);
+    public static <T extends Serializable> T fromSHAFile(String sha, Class<T> type) {
+        String preTwo = sha.substring(0, 2);
         File FileDire = Utils.join(Repository.OBJECTS_DIR, preTwo);
-        File file = Utils.join(FileDire, SHA);
+        File file = Utils.join(FileDire, sha);
         if (!file.exists()) {
             throw new RuntimeException("File does not exist: " + file.getAbsolutePath());
         }
@@ -169,14 +169,14 @@ public class Repository {
     }
 
     /**
-     * Deletes a file based on its SHA-1 hash.
+     * Deletes a file based on its sha-1 hash.
      *
-     * @param SHA The SHA-1 hash of the file to delete.
+     * @param sha The sha-1 hash of the file to delete.
      */
-    public static void delSHAFile(String SHA) {
-        String preTwo = SHA.substring(0, 2);
+    public static void delSHAFile(String sha) {
+        String preTwo = sha.substring(0, 2);
         File FileDire = Utils.join(Repository.OBJECTS_DIR, preTwo);
-        File file = Utils.join(FileDire, SHA);
+        File file = Utils.join(FileDire, sha);
         Utils.restrictedDelete(file);
     }
 

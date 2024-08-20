@@ -57,8 +57,7 @@ public class Log {
         for (String s : eachLine) {
             String[] line = s.split(";");
             if (line[1].equals(message)) {
-                Commit temp = Commit.fromFile(line[0]);
-                printCommit(temp);
+                System.out.println(line[0]);
                 flag = true;
             }
         }

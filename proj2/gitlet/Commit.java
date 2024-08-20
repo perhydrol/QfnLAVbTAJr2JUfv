@@ -13,7 +13,7 @@ import java.util.List;
  * A Commit object records the state of a repository at a given time.
  * Each commit has a message describing the changes made, a reference to a tree object that
  * represents the file system snapshot, a reference to the parent commit (if any),
- * and a timestamp. The Commit object is also identified by a unique SHA-1 hash.
+ * and a timestamp. The Commit object is also identified by a unique sha-1 hash.
  * <p>
  * Commits are stored in a version control system to track the history of a project.
  * This class provides methods for creating a commit, saving it to persistent storage,
@@ -28,12 +28,12 @@ public class Commit implements Serializable {
      */
     private final String message;
     /**
-     * The SHA-1 hash of the tree object associated with this commit,
+     * The sha-1 hash of the tree object associated with this commit,
      * which represents the file system state at the time of this commit.
      */
     private final String treeSHA;
     /**
-     * The SHA-1 hash of the parent commits. The list may contain one or more SHA-1 hashes.
+     * The sha-1 hash of the parent commits. The list may contain one or more sha-1 hashes.
      * If this commit is the root commit, the list will be empty.
      */
     private final List<String> parentSHAs;
@@ -41,14 +41,14 @@ public class Commit implements Serializable {
      * The timestamp of this commit in milliseconds since the Unix epoch.
      */
     private final long time;
-    private final String SHA;
+    private final String sha;
 
     /**
-     * Constructs a new Commit object with the specified message, tree SHA, and parent SHA.
+     * Constructs a new Commit object with the specified message, tree sha, and parent sha.
      *
      * @param message   The commit message.
-     * @param treeSHA   The SHA-1 hash of the associated tree object.
-     * @param parentSHA The SHA-1 hash of the parent commit (can be null for root commits).
+     * @param treeSHA   The sha-1 hash of the associated tree object.
+     * @param parentSHA The sha-1 hash of the parent commit (can be null for root commits).
      */
     public Commit(String message, String treeSHA, String parentSHA) {
         if (parentSHA.isEmpty()) {
@@ -60,49 +60,49 @@ public class Commit implements Serializable {
         this.treeSHA = treeSHA;
         this.parentSHAs = new ArrayList<>();
         this.parentSHAs.add(parentSHA);
-        this.SHA = Utils.sha1(message, treeSHA, parentSHA);
+        this.sha = Utils.sha1(message, treeSHA, parentSHA);
     }
 
     /**
-     * Constructs a new Commit object with the specified message, tree SHA, and a list of parent SHAs.
+     * Constructs a new Commit object with the specified message, tree sha, and a list of parent SHAs.
      *
      * @param message    The commit message.
-     * @param treeSHA    The SHA-1 hash of the associated tree object.
-     * @param parentSHAs The list of SHA-1 hashes of parent commits.
+     * @param treeSHA    The sha-1 hash of the associated tree object.
+     * @param parentSHAs The list of sha-1 hashes of parent commits.
      */
     public Commit(String message, String treeSHA, List<String> parentSHAs) {
         this.time = System.currentTimeMillis();
         this.message = message;
         this.treeSHA = treeSHA;
         this.parentSHAs = parentSHAs;
-        this.SHA = Utils.sha1(message, treeSHA, parentSHAs);
+        this.sha = Utils.sha1(message, treeSHA, parentSHAs);
     }
 
     /**
-     * Loads a Commit object from the filesystem based on its SHA-1 hash.
+     * Loads a Commit object from the filesystem based on its sha-1 hash.
      *
-     * @param SHA The SHA-1 hash of the commit to load.
-     * @return The Commit object corresponding to the given SHA-1 hash.
+     * @param sha The sha-1 hash of the commit to load.
+     * @return The Commit object corresponding to the given sha-1 hash.
      * @throws RuntimeException if the commit file does not exist or cannot be read.
      */
-    public static Commit fromFile(String SHA) {
-        return Repository.fromSHAFile(SHA, Commit.class);
+    public static Commit fromFile(String sha) {
+        return Repository.fromSHAFile(sha, Commit.class);
     }
 
     /**
-     * Loads a Commit object from the filesystem based on a short SHA-1 hash.
-     * This method searches the appropriate directory for the full SHA-1 hash.
+     * Loads a Commit object from the filesystem based on a short sha-1 hash.
+     * This method searches the appropriate directory for the full sha-1 hash.
      *
-     * @param SHA The short SHA-1 hash of the commit to load.
-     * @return The Commit object corresponding to the given short SHA-1 hash, or null if not found.
+     * @param sha The short sha-1 hash of the commit to load.
+     * @return The Commit object corresponding to the given short sha-1 hash, or null if not found.
      */
-    public static Commit fromFileShortSHA(String SHA) {
-        File dir = Utils.join(Repository.OBJECTS_DIR, SHA.substring(0, 2));
+    public static Commit fromFileShortSHA(String sha) {
+        File dir = Utils.join(Repository.OBJECTS_DIR, sha.substring(0, 2));
         if (dir.exists()) {
             List<String> files = Utils.plainFilenamesIn(dir);
             if (files != null) {
                 for (String i : files) {
-                    if (SHA.equals(i.substring(0, SHA.length()))) {
+                    if (sha.equals(i.substring(0, sha.length()))) {
                         return fromFile(i);
                     }
                 }
@@ -117,7 +117,7 @@ public class Commit implements Serializable {
     }
 
     public static Commit getSplitPoint(Commit a, Commit b) {
-        if (a.SHA.equals(b.SHA)) {
+        if (a.sha.equals(b.sha)) {
             return a;
         }
         for (String curA : a.parentSHAs) {
@@ -158,16 +158,16 @@ public class Commit implements Serializable {
     }
 
     public String getSHA() {
-        return SHA;
+        return sha;
     }
 
     /**
-     * Saves the current Commit object by serializing it and storing it using its SHA-1 hash as the filename.
+     * Saves the current Commit object by serializing it and storing it using its sha-1 hash as the filename.
      *
      * @throws RuntimeException if there is an issue saving the commit file.
      */
     public void saveCommit() {
-        Repository.saveSHAFile(SHA, this);
+        Repository.saveSHAFile(sha, this);
     }
 
     /**
@@ -193,10 +193,5 @@ public class Commit implements Serializable {
             System.err.println("Error recovering file: " + e.getMessage());
         }
         return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return SHA.hashCode();
     }
 }

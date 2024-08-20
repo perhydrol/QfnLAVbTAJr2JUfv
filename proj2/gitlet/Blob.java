@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 /**
  * Represents a blob in the version control system.
- * A blob stores the content of a file, its SHA-1 hash,
+ * A blob stores the content of a file, its sha-1 hash,
  * the time it was created, and its file path.
  */
 public class Blob implements Serializable {
@@ -19,9 +19,9 @@ public class Blob implements Serializable {
      */
     private final long time;
     /**
-     * The SHA-1 hash of the file content, uniquely identifying this blob.
+     * The sha-1 hash of the file content, uniquely identifying this blob.
      */
-    private String SHA;
+    private String sha;
     /**
      * The content of the file as a string.
      */
@@ -37,7 +37,7 @@ public class Blob implements Serializable {
         filePath = Repository.toRelativePath(codeFile.toString());
         if (codeFile.canWrite()) {
             code = Utils.readContentsAsString(codeFile);
-            this.SHA = Utils.sha1(code);
+            this.sha = Utils.sha1(code);
         } else {
 
         }
@@ -53,14 +53,14 @@ public class Blob implements Serializable {
     }
 
     /**
-     * Loads a Blob object from the filesystem based on its SHA-1 hash.
+     * Loads a Blob object from the filesystem based on its sha-1 hash.
      *
-     * @param SHA The SHA-1 hash of the blob to load.
-     * @return The Blob object corresponding to the given SHA-1 hash.
+     * @param sha The sha-1 hash of the blob to load.
+     * @return The Blob object corresponding to the given sha-1 hash.
      * @throws RuntimeException if the blob file does not exist or cannot be read.
      */
-    public static Blob fromFile(String SHA) {
-        return Repository.fromSHAFile(SHA, Blob.class);
+    public static Blob fromFile(String sha) {
+        return Repository.fromSHAFile(sha, Blob.class);
     }
 
     /**
@@ -82,12 +82,12 @@ public class Blob implements Serializable {
     }
 
     /**
-     * Returns the SHA-1 hash of the file content.
+     * Returns the sha-1 hash of the file content.
      *
-     * @return The SHA-1 hash string.
+     * @return The sha-1 hash string.
      */
     public String getSHA() {
-        return this.SHA;
+        return this.sha;
     }
 
     /**
@@ -101,13 +101,13 @@ public class Blob implements Serializable {
 
     /**
      * Saves this blob to the filesystem. The blob is stored in a directory
-     * named after the first character of its SHA-1 hash, inside the objects' directory.
+     * named after the first character of its sha-1 hash, inside the objects' directory.
      *
      * @return true if the blob was successfully saved.
      * @throws RuntimeException if there is an issue creating the blob file.
      */
     public boolean saveBlob() {
-        return Repository.saveSHAFile(SHA, this);
+        return Repository.saveSHAFile(sha, this);
     }
 
     /**

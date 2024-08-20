@@ -87,7 +87,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        //args=new String[]{"rm","tt.txt"};
+        //args=new String[]{"find","initial commit"};
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;
@@ -124,8 +124,8 @@ public class Main {
                 String message = args[1];
                 if (Repository.GITLET_DIR.exists()) {
                     StagingArea stagingArea = new StagingArea();
-                    String SHA = stagingArea.genNewCommit(message);
-                    appendLineToCommitLog(SHA + ";" + message);
+                    String sha = stagingArea.genNewCommit(message);
+                    appendLineToCommitLog(sha + ";" + message);
                 } else {
                     System.out.println("Not in an initialized Gitlet directory.");
                 }

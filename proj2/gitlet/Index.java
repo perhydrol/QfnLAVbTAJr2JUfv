@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 /**
- * The Index class represents a mapping of file paths to their corresponding SHA-1 hashes
+ * The Index class represents a mapping of file paths to their corresponding sha-1 hashes
  * in a version control system. It tracks the state of files and their modifications.
  * The Index is serialized and saved to disk for persistence.
  */
@@ -14,7 +14,7 @@ public class Index implements Serializable {
     private final static File INDEX_PATH = Repository.INDEX;
     // The timestamp of the last modification to the index.
     private long time;
-    // A map of file paths to their corresponding SHA-1 hashes.
+    // A map of file paths to their corresponding sha-1 hashes.
     private HashMap<String, String> entry;
 
     /**

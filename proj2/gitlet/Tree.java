@@ -10,17 +10,17 @@ import java.util.Set;
 /**
  * The Tree class represents a directory structure within a version control system.
  * Each Tree object can contain references to subdirectories (as other Tree objects)
- * and files (with their corresponding SHA-1 hashes). The class is serializable for
+ * and files (with their corresponding sha-1 hashes). The class is serializable for
  * persistent storage.
  */
 public class Tree implements Serializable {
     // The path of the current directory represented by this Tree object.
     private final String path;
 
-    private String SHA;
-    // Map of subdirectory names to their corresponding SHA-1 hashes.
+    private String sha;
+    // Map of subdirectory names to their corresponding sha-1 hashes.
     private HashMap<String, String> subDirs;
-    // Map of file names to their blob corresponding SHA-1 hashes.
+    // Map of file names to their blob corresponding sha-1 hashes.
     private HashMap<String, String> files;
 
     /**
@@ -30,7 +30,7 @@ public class Tree implements Serializable {
      * @param path The path of the directory.
      */
     public Tree(String path) {
-        this.SHA = null;
+        this.sha = null;
         this.path = path;
         subDirs = new HashMap<>();
         files = new HashMap<>();
@@ -56,8 +56,8 @@ public class Tree implements Serializable {
         }
     }
 
-    public static Tree fromFile(String SHA) {
-        return Repository.fromSHAFile(SHA, Tree.class);
+    public static Tree fromFile(String sha) {
+        return Repository.fromSHAFile(sha, Tree.class);
     }
 
     /**
@@ -68,7 +68,7 @@ public class Tree implements Serializable {
      * @param targetTree The target tree to check out.
      */
     public static void checkout(Tree curTree, Tree targetTree) {
-        if (curTree.SHA.equals(targetTree.SHA)) {
+        if (curTree.sha.equals(targetTree.sha)) {
             return;
         }
         HashMap<String, String> tarSubDirs = targetTree.getSubDirs();
@@ -103,7 +103,7 @@ public class Tree implements Serializable {
     }
 
     public static boolean ifReset(Tree curTree, Tree targetTree) {
-        if (curTree.SHA.equals(targetTree.SHA)) {
+        if (curTree.sha.equals(targetTree.sha)) {
             return true;
         }
         boolean ans = true;
@@ -132,10 +132,10 @@ public class Tree implements Serializable {
     }
 
     /**
-     * Retrieves the SHA-1 hash of a file given its path.
+     * Retrieves the sha-1 hash of a file given its path.
      *
      * @param filePath The path of the file.
-     * @return The SHA-1 hash of the file.
+     * @return The sha-1 hash of the file.
      */
     public String getFileSHA(String filePath) {
         filePath = Repository.toRelativePath(filePath);
@@ -147,11 +147,11 @@ public class Tree implements Serializable {
     }
 
     /**
-     * Recursively retrieves the SHA-1 hash of a file within subdirectories.
+     * Recursively retrieves the sha-1 hash of a file within subdirectories.
      *
      * @param filePathList The list of directory names leading to the file.
      * @param file         The name of the file.
-     * @return The SHA-1 hash of the file.
+     * @return The sha-1 hash of the file.
      */
     public String getFileSHA(List<String> filePathList, String file) {
         if (filePathList.size() == 1) {
@@ -163,21 +163,21 @@ public class Tree implements Serializable {
     }
 
     /**
-     * Saves the current Tree object by serializing it and storing it using its SHA-1 hash as the filename.
+     * Saves the current Tree object by serializing it and storing it using its sha-1 hash as the filename.
      *
      * @return true if the Tree was successfully saved.
      */
     public boolean saveTree() {
         getSHA();
-        return Repository.saveSHAFile(SHA, this);
+        return Repository.saveSHAFile(sha, this);
     }
 
     /**
      * Builds the Tree object by iterating through the files and subdirectories of the directory it represents.
      * This method recursively builds and saves Tree objects for each subdirectory.
      *
-     * @param entry A map from file names to their corresponding SHA-1 hashes.
-     * @return The SHA-1 hash of the current Tree object after it has been built.
+     * @param entry A map from file names to their corresponding sha-1 hashes.
+     * @return The sha-1 hash of the current Tree object after it has been built.
      */
     public String BuildTree(HashMap<String, String> entry) {
         List<String> fileList = Utils.plainFilenamesIn(Repository.StringToFile(path));
@@ -201,31 +201,31 @@ public class Tree implements Serializable {
                 }
                 Tree subDirTree = new Tree(path + System.getProperty("file.separator") + subDir, entry);
                 subDirTree.saveTree();
-                this.subDirs.put(subDir, subDirTree.SHA);
+                this.subDirs.put(subDir, subDirTree.sha);
             }
         }
         return getSHA();
     }
 
     /**
-     * Returns the SHA-1 hash of this Tree object. If it hasn't been generated yet, it will be created.
+     * Returns the sha-1 hash of this Tree object. If it hasn't been generated yet, it will be created.
      *
-     * @return The SHA-1 hash of this Tree object.
+     * @return The sha-1 hash of this Tree object.
      */
     public String getSHA() {
-        if (SHA == null) {
+        if (sha == null) {
             if (files.values().isEmpty() && subDirs.values().isEmpty()) {
-                SHA = Utils.sha1("There is no thing");
+                sha = Utils.sha1("There is no thing");
             } else if (files.values().isEmpty()) {
-                SHA = Utils.sha1(String.join(";", subDirs.values()));
+                sha = Utils.sha1(String.join(";", subDirs.values()));
             } else if (subDirs.values().isEmpty()) {
                 //System.out.println(files.values());
-                SHA = Utils.sha1(String.join(";", files.values()));
+                sha = Utils.sha1(String.join(";", files.values()));
             } else {
-                SHA = Utils.sha1(String.join(";", files.values()), String.join(";", subDirs.values()));
+                sha = Utils.sha1(String.join(";", files.values()), String.join(";", subDirs.values()));
             }
         }
-        return SHA;
+        return sha;
     }
 
     /**
@@ -238,7 +238,7 @@ public class Tree implements Serializable {
     }
 
     /**
-     * Returns the map of subdirectory names to their corresponding SHA-1 hashes.
+     * Returns the map of subdirectory names to their corresponding sha-1 hashes.
      *
      * @return The map of subdirectories.
      */
@@ -247,7 +247,7 @@ public class Tree implements Serializable {
     }
 
     /**
-     * Returns the map of file names to their corresponding SHA-1 hashes.
+     * Returns the map of file names to their corresponding sha-1 hashes.
      *
      * @return The map of files.
      */

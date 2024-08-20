@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class Branch implements Serializable {
     /**
-     * The SHA-1 hash of the initial commit for this branch.
+     * The sha-1 hash of the initial commit for this branch.
      */
     private final String STAR_COMMIT_SHA;
     /**
@@ -14,19 +14,19 @@ public class Branch implements Serializable {
      */
     private final String name;
     /**
-     * The SHA-1 hash of the most recent commit in this branch.
+     * The sha-1 hash of the most recent commit in this branch.
      */
     private String END_COMMIT_SHA;
     /**
-     * The SHA-1 hash of the current commit pointed to by this branch.
+     * The sha-1 hash of the current commit pointed to by this branch.
      */
     private String currentCommitSHA;
 
     /**
-     * Constructs a Branch object with the given name and initial commit SHA.
+     * Constructs a Branch object with the given name and initial commit sha.
      *
      * @param name          The name of the branch.
-     * @param starCommitSHA The SHA-1 hash of the initial commit.
+     * @param starCommitSHA The sha-1 hash of the initial commit.
      */
     public Branch(String name, String starCommitSHA) {
         STAR_COMMIT_SHA = starCommitSHA;
@@ -60,27 +60,27 @@ public class Branch implements Serializable {
     }
 
     /**
-     * Returns the SHA-1 hash of the initial commit.
+     * Returns the sha-1 hash of the initial commit.
      *
-     * @return The initial commit SHA-1 hash.
+     * @return The initial commit sha-1 hash.
      */
     public String getSTAR_COMMIT_SHA() {
         return STAR_COMMIT_SHA;
     }
 
     /**
-     * Returns the SHA-1 hash of the end commit.
+     * Returns the sha-1 hash of the end commit.
      *
-     * @return The end commit SHA-1 hash.
+     * @return The end commit sha-1 hash.
      */
     public String getEND_COMMIT_SHA() {
         return END_COMMIT_SHA;
     }
 
     /**
-     * Returns the SHA-1 hash of the current commit.
+     * Returns the sha-1 hash of the current commit.
      *
-     * @return The current commit SHA-1 hash.
+     * @return The current commit sha-1 hash.
      */
     public String getCurrentCommitSHA() {
         return currentCommitSHA;
@@ -109,9 +109,9 @@ public class Branch implements Serializable {
     }
 
     /**
-     * Updates the end commit SHA and the current commit SHA to the given commit SHA.
+     * Updates the end commit sha and the current commit sha to the given commit sha.
      *
-     * @param commitSHA The SHA-1 hash of the new commit.
+     * @param commitSHA The sha-1 hash of the new commit.
      */
     public void newCommit(String commitSHA) {
         END_COMMIT_SHA = commitSHA;
@@ -119,9 +119,9 @@ public class Branch implements Serializable {
     }
 
     /**
-     * Moves the current commit pointer to the given commit SHA.
+     * Moves the current commit pointer to the given commit sha.
      *
-     * @param commitSHA The SHA-1 hash of the new commit.
+     * @param commitSHA The sha-1 hash of the new commit.
      */
     public void moveCurrentCommit(String commitSHA) {
         currentCommitSHA = commitSHA;
