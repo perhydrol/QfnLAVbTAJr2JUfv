@@ -87,7 +87,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        args=new String[]{"checkout","master"};
+        //args=new String[]{"checkout","master"};
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;
