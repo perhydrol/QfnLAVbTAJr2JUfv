@@ -4,8 +4,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents a Gitlet commit object.
@@ -117,14 +116,44 @@ public class Commit implements Serializable {
     }
 
     public static Commit getSplitPoint(Commit a, Commit b) {
-        if (a.sha.equals(b.sha)) {
-            return a;
-        }
-        for (String curA : a.parentSHAs) {
-            for (String curB : b.parentSHAs) {
-                Commit ret = getSplitPoint(curA, curB);
-                if (ret != null) {
-                    return ret;
+        // 初始化队列和访问集合
+        Queue<String> queueA = new LinkedList<>(a.parentSHAs);
+        Queue<String> queueB = new LinkedList<>(b.parentSHAs);
+        Set<String> visitedA = new HashSet<>();
+        Set<String> visitedB = new HashSet<>();
+
+        visitedA.add(a.sha);
+        visitedB.add(b.sha);
+
+        // BFS 搜索公共祖先
+        while (!queueA.isEmpty() || !queueB.isEmpty()) {
+            if (!queueA.isEmpty()) {
+                String shaA = queueA.poll();
+                if (visitedB.contains(shaA)) {
+                    return Commit.fromFile(shaA);
+                }
+                Commit commitA = Commit.fromFile(shaA);
+                if (commitA != null) {
+                    for (String parentSHA : commitA.parentSHAs) {
+                        if (visitedA.add(parentSHA)) {
+                            queueA.add(parentSHA);
+                        }
+                    }
+                }
+            }
+
+            if (!queueB.isEmpty()) {
+                String shaB = queueB.poll();
+                if (visitedA.contains(shaB)) {
+                    return Commit.fromFile(shaB);
+                }
+                Commit commitB = Commit.fromFile(shaB);
+                if (commitB != null) {
+                    for (String parentSHA : commitB.parentSHAs) {
+                        if (visitedB.add(parentSHA)) {
+                            queueB.add(parentSHA);
+                        }
+                    }
                 }
             }
         }
