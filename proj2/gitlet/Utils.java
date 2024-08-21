@@ -103,6 +103,14 @@ class Utils {
         }
     }
 
+    static boolean delFile(File file) {
+        if (!file.isDirectory()) {
+            return file.delete();
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Deletes the file named FILE if it exists and is not a directory.
      * Returns true if FILE was deleted, and false otherwise.  Refuses

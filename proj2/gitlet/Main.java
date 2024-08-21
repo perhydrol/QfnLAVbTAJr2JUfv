@@ -87,7 +87,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        //args=new String[]{"find","initial commit"};
+        //args=new String[]{"checkout","7b97ec8c52786f41268c972e5b91bcdbed9e2dcf","--","t.txt"};
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;
@@ -202,6 +202,10 @@ public class Main {
                             break;
                         case 4:
                             String commitSHA = args[1];
+                            if (!args[2].equals("--")) {
+                                System.out.println("Incorrect operands.");
+                                System.exit(0);
+                            }
                             Commit targetCommit = Commit.fromFileShortSHA(commitSHA);
                             if (targetCommit == null) {
                                 System.out.println("No commit with that id exists.");
@@ -268,7 +272,7 @@ public class Main {
                     }
                     File branchFile = Utils.join(Repository.HEADS_DIR, s);
                     if (branchFile.exists()) {
-                        Utils.restrictedDelete(branchFile);
+                        Utils.delFile(branchFile);
                     } else {
                         System.out.println("A branch with that name does not exist.");
                         System.exit(0);

@@ -94,12 +94,15 @@ public class StagingArea {
         }
         String curSHA = Repository.getFileSHA(filePath);
         String preSHA = this.tree.getFileSHA(filePath);
+        this.stagingArea.put(filePath);
+        stagingArea.saveIndex();
         if (preSHA == null || !preSHA.equals(curSHA)) {
-            this.stagingArea.put(filePath);
-            stagingArea.saveIndex();
             trackedFiles.put(filePath, 1);
             saveChanged();
             return true;
+        } else {
+            trackedFiles.put(filePath, 0);
+            saveChanged();
         }
         return false;
     }
@@ -125,7 +128,7 @@ public class StagingArea {
      * @return true if the file was added to the staging area, false otherwise.
      */
     public boolean add(File filePath) {
-        String relativeFilePath=Repository.toRelativePath(filePath.toString());
+        String relativeFilePath = Repository.toRelativePath(filePath.toString());
         return add(relativeFilePath);
     }
 
@@ -146,17 +149,14 @@ public class StagingArea {
      * @return true if the file was successfully removed, false otherwise.
      */
     public boolean rm(File filePath) {
-        String curSHA = Repository.getFileSHA(filePath);
         String preSHA = this.tree.getFileSHA(filePath);
-        String relativeFilePath=Repository.toRelativePath(filePath.toString());
+        String relativeFilePath = Repository.toRelativePath(filePath.toString());
         if (preSHA != null || stagingArea.getFileSHA(relativeFilePath) != null) {
             stagingArea.remove(relativeFilePath);
             if (filePath.exists() && preSHA != null) {
                 Utils.restrictedDelete(filePath);
-                trackedFiles.put(relativeFilePath, -1);
-            } else {
-                trackedFiles.remove(relativeFilePath);
             }
+            trackedFiles.put(relativeFilePath, -1);
             stagingArea.saveIndex();
             saveChanged();
             return true;

@@ -22,6 +22,7 @@ public class Branch implements Serializable {
      */
     private String currentCommitSHA;
 
+
     /**
      * Constructs a Branch object with the given name and initial commit sha.
      *
