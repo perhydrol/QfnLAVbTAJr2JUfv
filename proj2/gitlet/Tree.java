@@ -73,13 +73,13 @@ public class Tree implements Serializable {
         }
         HashMap<String, String> tarSubDirs = targetTree.getSubDirs();
         HashMap<String, String> curSubDirs = curTree.getSubDirs();
-        for (String subDirPath : tarSubDirs.keySet()) {
-            if (curSubDirs.get(subDirPath) != null) {
-                checkout(curSubDirs.get(subDirPath), tarSubDirs.get(subDirPath));
-            } else {
-                fromFile(tarSubDirs.get(subDirPath)).recoveryTree();
-            }
-        }
+        //for (String subDirPath : tarSubDirs.keySet()) {
+        //    if (curSubDirs.containsKey(subDirPath)) {
+        //        checkout(curSubDirs.get(subDirPath), tarSubDirs.get(subDirPath));
+        //} else {
+        //        fromFile(tarSubDirs.get(subDirPath)).recoveryTree();
+        //    }
+        //}
         HashMap<String, String> curFiles = curTree.getFiles();
         HashMap<String, String> targetFiles = targetTree.getFiles();
         Set<String> delFiles = new HashSet<>(curFiles.keySet());
@@ -118,9 +118,11 @@ public class Tree implements Serializable {
         HashMap<String, String> targetFiles = targetTree.getFiles();
         Set<String> untrackedFiles = new HashSet<>(targetFiles.keySet());
         untrackedFiles.removeAll(curFiles.keySet());
-        if (!untrackedFiles.isEmpty()) {
-            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-            return false;
+        for (String untrackedFile : untrackedFiles) {
+            if (curTree.files.containsKey(untrackedFile)) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                return false;
+            }
         }
         return ans;
     }

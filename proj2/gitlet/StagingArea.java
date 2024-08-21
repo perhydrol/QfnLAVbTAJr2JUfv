@@ -155,8 +155,10 @@ public class StagingArea {
             stagingArea.remove(relativeFilePath);
             if (filePath.exists() && preSHA != null) {
                 Utils.restrictedDelete(filePath);
+                trackedFiles.put(relativeFilePath, -1);
+            } else {
+                trackedFiles.remove(relativeFilePath);
             }
-            trackedFiles.put(relativeFilePath, -1);
             stagingArea.saveIndex();
             saveChanged();
             return true;
