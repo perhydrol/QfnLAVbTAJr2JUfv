@@ -3,6 +3,9 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Branch implements Serializable {
     /**
@@ -54,6 +57,84 @@ public class Branch implements Serializable {
 
     public static void merge(Branch current, Branch target) {
         Commit splitPoint = Commit.getSplitPoint(current.STAR_COMMIT_SHA, target.STAR_COMMIT_SHA);
+        Commit currentCommit = Commit.fromFile(current.END_COMMIT_SHA);
+        Commit targetCommit = Commit.fromFile(target.END_COMMIT_SHA);
+        HashMap<String, String> split = Tree.fromFile(splitPoint.getTreeSHA()).getFiles();
+        HashMap<String, String> cur = Tree.fromFile(currentCommit.getTreeSHA()).getFiles();
+        HashMap<String, String> targ = Tree.fromFile(targetCommit.getTreeSHA()).getFiles();
+        StagingArea stagingArea = new StagingArea();
+        if (splitPoint.getSHA().equals(targetCommit.getSHA())) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            return;
+        } else if (splitPoint.getSHA().equals(currentCommit.getSHA())) {
+            System.out.println("Current branch fast-forwarded.");
+            return;
+        }
+        Set<String> items = new HashSet<>(cur.keySet());
+        items.addAll(targ.keySet());
+        for (String item : items) {
+            String tarSHA = targ.getOrDefault(item, "");
+            String curSHA = cur.getOrDefault(item, "");
+            String splitSHA = split.getOrDefault(item, "");
+            // 3. 文件在给定分支中自分裂点起修改，但在当前分支中未修改
+            boolean isModifiedInGivenBranchOnly = !tarSHA.equals(splitSHA)
+                    && curSHA.equals(splitSHA);
+
+            // 4. 文件在当前分支中自分裂点起修改，但在给定分支中未修改
+            boolean isModifiedInCurrentBranchOnly = !curSHA.equals(splitSHA)
+                    && tarSHA.equals(splitSHA);
+
+            // 5. 文件在当前分支和给定分支中以相同方式修改或删除
+            boolean isModifiedInSameWayInBothBranches = curSHA.equals(tarSHA);
+
+            // 6. 文件在分裂点不存在，仅在当前分支存在
+            boolean isFileOnlyInCurrentBranch = splitSHA.isEmpty() && !curSHA.isEmpty() && tarSHA.isEmpty();
+
+            // 7. 文件在分裂点不存在，仅在给定分支存在
+            boolean isFileOnlyInGivenBranch = splitSHA.isEmpty() && curSHA.isEmpty() && !tarSHA.isEmpty();
+
+            // 8. 文件在分裂点存在，在当前分支未修改，在给定分支缺失
+            boolean isUnmodifiedInCurrentAndAbsentInGiven = !splitSHA.isEmpty()
+                    && splitSHA.equals(curSHA)
+                    && tarSHA.isEmpty();
+
+            // 9. 文件在分裂点存在，在给定分支未修改，在当前分支缺失
+            boolean isUnmodifiedInGivenAndAbsentInCurrent = !splitSHA.isEmpty()
+                    && curSHA.isEmpty()
+                    && tarSHA.equals(splitSHA);
+
+            // 10. 文件在当前分支和给定分支中以不同方式修改（发生冲突）
+            boolean isConflict = !(curSHA.isEmpty() && tarSHA.isEmpty()) && !curSHA.equals(tarSHA);
+
+            boolean willChange = isModifiedInGivenBranchOnly || isFileOnlyInGivenBranch || isUnmodifiedInCurrentAndAbsentInGiven;
+            // 11. 存在未跟踪文件且会被合并覆盖或删除
+            boolean isUntrackedFileInTheWay = !stagingArea.isTracked(item) && willChange;
+
+            if (isModifiedInCurrentBranchOnly || isModifiedInSameWayInBothBranches || isFileOnlyInCurrentBranch || isUnmodifiedInGivenAndAbsentInCurrent) {
+                continue;
+            } else if (isModifiedInGivenBranchOnly || isFileOnlyInGivenBranch) {
+                Blob file = Blob.fromFile(tarSHA);
+                file.recovery();
+                stagingArea.add(file.getFilePath());
+                stagingArea.saveChanged();
+            } else if (isUnmodifiedInCurrentAndAbsentInGiven) {
+                stagingArea.rm(item);
+            } else if (isConflict) {
+                System.out.println("Encountered a merge conflict.");
+                handleMergeConflict(item, curSHA, tarSHA);
+            } else if (isUntrackedFileInTheWay) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                return;
+            }
+        }
+    }
+
+    private static void handleMergeConflict(String item, String curSHA, String tarSHA) {
+        Blob curBlob = Blob.fromFile(curSHA);
+        Blob tarBlob = Blob.fromFile(tarSHA);
+        String contect = "<<<<<<< HEAD\n" + curBlob.getCode() + "=======\n" + tarBlob.getCode() + ">>>>>>>\n";
+        File file = Repository.StringToFile(item);
+        Utils.writeContents(file, contect);
     }
 
     public static void merge(String current, String target) {

@@ -194,4 +194,16 @@ public class StagingArea {
         saveChanged();
         return newCommit.getSHA();
     }
+
+    public boolean isTracked(File file) {
+        return isTracked(file.toString());
+    }
+
+    public boolean isTracked(String file) {
+        file = Repository.toRelativePath(file);
+        if (trackedFiles.get(file) != null) {
+            return true;
+        }
+        return false;
+    }
 }

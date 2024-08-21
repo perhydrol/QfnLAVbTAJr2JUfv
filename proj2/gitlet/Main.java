@@ -320,6 +320,17 @@ public class Main {
                     System.out.println("Not in an initialized Gitlet directory.");
                 }
                 break;
+            case "merge":
+                if (Repository.GITLET_DIR.exists()) {
+                    String branchName = args[1];
+                    Head head = Head.fromFile();
+                    Branch curBranch = head.getCurrentBranch();
+                    Branch targetBranch = Branch.fromFile(branchName);
+                    Branch.merge(curBranch, targetBranch);
+                } else {
+                    System.out.println("Not in an initialized Gitlet directory.");
+                }
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 break;
