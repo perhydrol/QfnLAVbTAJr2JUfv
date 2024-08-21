@@ -87,7 +87,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        //args=new String[]{"checkout","7b97ec8c52786f41268c972e5b91bcdbed9e2dcf","--","t.txt"};
+        //args=new String[]{"merge","other"};
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;

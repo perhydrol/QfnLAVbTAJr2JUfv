@@ -56,7 +56,7 @@ public class Branch implements Serializable {
     }
 
     public static void merge(Branch current, Branch target) {
-        Commit splitPoint = Commit.getSplitPoint(current.STAR_COMMIT_SHA, target.STAR_COMMIT_SHA);
+        Commit splitPoint = Commit.getSplitPoint(current.currentCommitSHA, target.currentCommitSHA);
         Commit currentCommit = Commit.fromFile(current.END_COMMIT_SHA);
         Commit targetCommit = Commit.fromFile(target.END_COMMIT_SHA);
         HashMap<String, String> split = Tree.fromFile(splitPoint.getTreeSHA()).getFiles();
@@ -122,11 +122,14 @@ public class Branch implements Serializable {
             } else if (isConflict) {
                 System.out.println("Encountered a merge conflict.");
                 handleMergeConflict(item, curSHA, tarSHA);
+                return;
             } else if (isUntrackedFileInTheWay) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
             }
         }
+        stagingArea.genNewCommit("Merged " + target.getName() + " into " + current.getName() + ".");
+        stagingArea.saveChanged();
     }
 
     private static void handleMergeConflict(String item, String curSHA, String tarSHA) {
