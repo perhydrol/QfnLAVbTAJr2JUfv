@@ -87,7 +87,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        //args = new String[]{"branch", "other"};
+        args = new String[]{"status", "f.txt"};
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;
@@ -309,6 +309,8 @@ public class Main {
                         Branch branch = head.getCurrentBranch();
                         branch.moveCurrentCommit(targetCommit.getSHA());
                         branch.saveBranch();
+                        StagingArea stagingArea = new StagingArea();
+                        stagingArea.cleanStagingArea(targetTree);
                     }
                 } else {
                     System.out.println("Not in an initialized Gitlet directory.");

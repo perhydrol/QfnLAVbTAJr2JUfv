@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * The Index class represents a mapping of file paths to their corresponding sha-1 hashes
@@ -64,6 +65,11 @@ public class Index implements Serializable {
             }
         }
         Utils.writeObject(INDEX_PATH, this);
+    }
+
+    public void setEntry(HashMap<String,String> target){
+        entry=new HashMap<>(target);
+        saveIndex();
     }
 
     /**

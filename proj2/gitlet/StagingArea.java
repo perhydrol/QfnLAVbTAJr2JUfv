@@ -88,12 +88,21 @@ public class StagingArea {
      * @return true if the file was added to the staging area, false if it was identical to the current commit's version.
      */
     public boolean add(String filePath) {
-        if (!Repository.StringToFile(filePath).exists()) {
+        String preSHA = this.tree.getFileSHA(filePath);
+        if (!Repository.StringToFile(filePath).exists() && preSHA == null) {
             System.out.println("File does not exist.");
             return false;
         }
+        if (trackedFiles.get(filePath) == -1) {
+            Blob temp = Blob.fromFile(preSHA);
+            temp.recovery();
+            trackedFiles.put(filePath, 0);
+            saveChanged();
+            this.stagingArea.put(filePath);
+            stagingArea.saveIndex();
+            return true;
+        }
         String curSHA = Repository.getFileSHA(filePath);
-        String preSHA = this.tree.getFileSHA(filePath);
         this.stagingArea.put(filePath);
         stagingArea.saveIndex();
         if (preSHA == null || !preSHA.equals(curSHA)) {
@@ -197,6 +206,12 @@ public class StagingArea {
         trackedFiles.clear();
         saveChanged();
         return newCommit.getSHA();
+    }
+
+    public void cleanStagingArea(Tree target) {
+        trackedFiles.clear();
+        saveChanged();
+        stagingArea.setEntry(target.getFiles());
     }
 
     public boolean isTracked(File file) {
