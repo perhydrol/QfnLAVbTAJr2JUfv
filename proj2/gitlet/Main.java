@@ -87,7 +87,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        args = new String[]{"status", "f.txt"};
+        //args = new String[]{"status", "f.txt"};
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;
