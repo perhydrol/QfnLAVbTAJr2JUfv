@@ -37,7 +37,7 @@ public class Blob implements Serializable {
         filePath = Repository.toRelativePath(codeFile.toString());
         if (codeFile.canWrite()) {
             code = Utils.readContentsAsString(codeFile);
-            this.sha = Utils.sha1(code);
+            this.sha = Utils.sha1(code+filePath);
         } else {
 
         }

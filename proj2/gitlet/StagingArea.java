@@ -156,6 +156,8 @@ public class StagingArea {
             if (filePath.exists() && preSHA != null) {
                 Utils.restrictedDelete(filePath);
                 trackedFiles.put(relativeFilePath, -1);
+            } else if (!filePath.exists() && preSHA != null) {
+                trackedFiles.put(relativeFilePath, -1);
             } else {
                 trackedFiles.remove(relativeFilePath);
             }
@@ -203,9 +205,6 @@ public class StagingArea {
 
     public boolean isTracked(String file) {
         file = Repository.toRelativePath(file);
-        if (trackedFiles.get(file) != null) {
-            return true;
-        }
-        return false;
+        return trackedFiles.get(file) != null;
     }
 }

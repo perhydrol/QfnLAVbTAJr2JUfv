@@ -109,11 +109,11 @@ public class Tree implements Serializable {
         boolean ans = true;
         HashMap<String, String> tarSubDirs = targetTree.getSubDirs();
         HashMap<String, String> curSubDirs = curTree.getSubDirs();
-        for (String subDirPath : tarSubDirs.keySet()) {
-            if (curSubDirs.get(subDirPath) != null) {
-                ans = ans && ifReset(curSubDirs.get(subDirPath), tarSubDirs.get(subDirPath));
-            }
-        }
+        // for (String subDirPath : tarSubDirs.keySet()) {
+        //     if (curSubDirs.get(subDirPath) != null) {
+        //         ans = ans && ifReset(curSubDirs.get(subDirPath), tarSubDirs.get(subDirPath));
+        //     }
+        // }
         HashMap<String, String> curFiles = curTree.getFiles();
         HashMap<String, String> targetFiles = targetTree.getFiles();
         Set<String> untrackedFiles = new HashSet<>(targetFiles.keySet());

@@ -87,7 +87,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        //args=new String[]{"checkout","master"};
+        //args = new String[]{"branch", "other"};
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;
@@ -222,6 +222,9 @@ public class Main {
                             }
                             try {
                                 Branch branch = Branch.fromFile(s);
+                                if (!Tree.ifReset(curTree, branch.getTree())) {
+                                    break;
+                                }
                                 Tree.checkout(curTree, branch.getTree());
                                 head.setCurrentCommitSHA(branch.getCurrentCommitSHA());
                                 head.setCurrentBranch(branch);
