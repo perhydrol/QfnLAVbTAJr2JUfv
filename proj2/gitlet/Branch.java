@@ -169,13 +169,19 @@ public class Branch implements Serializable {
             // 存在未跟踪文件且会被合并覆盖或删除
             boolean isUntrackedFileInTheWay = unTrackedFile && willChange;
             if (isModifiedInCurrentBranchOnly
-                    || isModifiedInSameWayInBothBranches || isFileOnlyInCurrentBranch || isUnmodifiedInGivenAndAbsentInCurrent) {
+                    || isModifiedInSameWayInBothBranches
+                    || isFileOnlyInCurrentBranch
+                    || isUnmodifiedInGivenAndAbsentInCurrent) {
+                if (!unTrackedFile && Base.stringToFile(item).exists()) {
+                    stagingArea.add(item);
+                }
                 continue;
             } else if (isUntrackedFileInTheWay) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
             } else if (isConflict) {
                 System.out.println("Encountered a merge conflict.");
+                stagingArea.add(item);
                 handleMergeConflict(item, curSHA, tarSHA);
             } else if (!tarSHA.isEmpty() && (isModifiedInGivenBranchOnly || isFileOnlyInGivenBranch)) {
                 Blob file = Blob.fromFile(tarSHA);
@@ -185,7 +191,20 @@ public class Branch implements Serializable {
                 stagingArea.rm(item);
             }
         }
-        Command.commit("Merged " + targetBranchName + " into " + currentBranchName + ".");
+        String message = "Merged " + targetBranchName + " into " + currentBranchName + ".";
+        List<String> parentsSha = new ArrayList<>();
+        parentsSha.add(currentSha);
+        parentsSha.add(targetSha);
+        Commit newCommit = new Commit(message, parentsSha, stagingArea.getTrackedFiles(), stagingArea.getRemovalFiles());
+        try {
+            Head head = Head.fromFile();
+            head.setCommitSHA(newCommit.getSha());
+            Branch branch = Branch.fromFile();
+            branch.addCommit(newCommit.getSha());
+            stagingArea.cleanStagingArea();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void handleMergeConflict(String item, String curSHA, String tarSHA) {

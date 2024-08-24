@@ -101,11 +101,8 @@ public class Commit implements Serializable {
                 }
                 Commit commitA = Commit.fromFile(shaA);
                 if (commitA != null) {
-                    for (String parentSHA : commitA.parentsSha) {
-                        if (visitedA.add(shaA)) {
-                            queueA.add(parentSHA);
-                        }
-                    }
+                    visitedA.add(shaA);
+                    queueA.addAll(commitA.parentsSha);
                 }
             }
             if (!queueB.isEmpty()) {
@@ -115,11 +112,8 @@ public class Commit implements Serializable {
                 }
                 Commit commitB = Commit.fromFile(shaB);
                 if (commitB != null) {
-                    for (String parentSHA : commitB.parentsSha) {
-                        if (visitedB.add(shaB)) {
-                            queueB.add(parentSHA);
-                        }
-                    }
+                    visitedB.add(shaB);
+                    queueB.addAll(commitB.parentsSha);
                 }
             }
         }
@@ -222,9 +216,6 @@ public class Commit implements Serializable {
         System.out.println("===");
         List<String> parents = this.getParentsSha();
         System.out.println("commit " + this.getSha());
-        if (parents.size() > 1) {
-            System.out.println("Merge: " + parents.get(0).substring(0, 8) + " " + parents.get(1).substring(0, 8));
-        }
         System.out.println(Base.timeFormat(this.getTime()));
         System.out.println(this.getMessage());
         System.out.println("");
