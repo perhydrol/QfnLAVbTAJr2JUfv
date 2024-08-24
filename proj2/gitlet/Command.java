@@ -10,7 +10,7 @@ public class Command {
         StagingArea stagingArea = null;
         try {
             stagingArea = new StagingArea();
-            Commit commit = new Commit("initial commit", "", stagingArea.getTrackedFiles());
+            Commit commit = new Commit("initial commit", "", stagingArea.getTrackedFiles(), null);
             Branch branch = new Branch("master", commit.getSha());
             Head head = new Head(commit.getSha(), branch.getCurrentBranchName());
         } catch (IOException e) {
@@ -19,6 +19,10 @@ public class Command {
     }
 
     static void add(String filePath) {
+        if (!Base.stringToFile(filePath).exists()) {
+            System.out.println("File does not exist.");
+            return;
+        }
         StagingArea stagingArea = StagingArea.fromFile();
         try {
             stagingArea.add(filePath);
@@ -29,14 +33,19 @@ public class Command {
 
     // Commit changes
     static void commit(String message) {
+        if (message == null || message.isEmpty()) {
+            System.out.println("Please enter a commit message.");
+            return;
+        }
         StagingArea stagingArea = StagingArea.fromFile();
         Head head = Head.fromFile();
         Commit commit = head.getCommit();
-        Commit newCommit = new Commit(message, commit.getSha(), stagingArea.getTrackedFiles());
+        Commit newCommit = new Commit(message, commit.getSha(), stagingArea.getTrackedFiles(), stagingArea.getRemovalFiles());
         try {
             head.setCommitSHA(newCommit.getSha());
             Branch branch = Branch.fromFile();
             branch.setCurrentCommit(newCommit.getSha());
+            stagingArea.cleanStagingArea();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -106,6 +115,8 @@ public class Command {
     static void status() {
         Branch branch = Branch.fromFile();
         StagingArea stagingArea = StagingArea.fromFile();
+        Head head = Head.fromFile();
+        Commit commit = head.getCommit();
         System.out.println("=== Branches ===");
         for (String branchName : branch.getBranches().keySet()) {
             if (branchName.equals(branch.getCurrentBranchName())) {
@@ -117,7 +128,9 @@ public class Command {
 
         System.out.println("\n=== Staged Files ===");
         for (String file : stagingArea.getTrackedFiles().keySet()) {
-            System.out.println(file);
+            if (commit.fileChanged(Base.stringToFile(file))) {
+                System.out.println(file);
+            }
         }
 
         System.out.println("\n=== Removed Files ===");
@@ -133,12 +146,9 @@ public class Command {
         System.out.println("\n=== Untracked Files ===");
         List<String> allFiles = Utils.plainFilenamesIn(Repository.CWD.toString());
         allFiles.removeAll(stagingArea.getRemovalFiles());
-        if (!stagingArea.getTrackedFiles().isEmpty()) {
-            allFiles.removeAll(stagingArea.getTrackedFiles().keySet());
-        }
-        if (!stagingArea.getChangedFiles().isEmpty()) {
-            allFiles.removeAll(stagingArea.getChangedFiles().keySet());
-        }
+        allFiles.removeAll(stagingArea.getTrackedFiles().keySet());
+        allFiles.removeAll(stagingArea.getChangedFiles().keySet());
+        allFiles.removeAll(commit.getTrackedFiles().keySet());
         for (String s : allFiles) {
             System.out.println(s);
         }

@@ -60,10 +60,17 @@ public class StagingArea implements Serializable {
     }
 
     public void rm(File filePath) throws IOException {
-        changedFiles.remove(filePath.toString());
-        trackedFiles.remove(filePath.toString());
         Head head = Head.fromFile();
         Commit commit = head.getCommit();
+        boolean trackedFile = changedFiles.containsKey(filePath.toString())
+                || trackedFiles.containsKey(filePath.toString())
+                || commit.fileExits(filePath.toString());
+        if (!trackedFile) {
+            System.out.println("No reason to remove the file.");
+            return;
+        }
+        changedFiles.remove(filePath.toString());
+        trackedFiles.remove(filePath.toString());
         if (filePath.exists() && commit.fileExits(filePath.toString())) {
             Utils.restrictedDelete(filePath);
         }

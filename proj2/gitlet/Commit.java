@@ -33,34 +33,42 @@ public class Commit implements Serializable {
         }
     }
 
-    public Commit(String m, List<String> perSha, HashMap<String, String> files) {
+    // 主要构造函数
+    public Commit(String m, List<String> perShaList, String perSha, HashMap<String, String> files, HashSet<String> remove) {
         message = m;
-        trackedFiles = files;
-        if (perSha == null) {
+        parentsSha = perShaList != null ? perShaList : new ArrayList<>();
+        if (perSha == null || perSha.isEmpty()) {
             time = 0;
-            parentsSha = new ArrayList<>();
+            trackedFiles = files;
         } else {
+            Commit perCommit = Commit.fromFile(perSha);
+            if (perCommit.trackedFiles.equals(files)) {
+                System.out.println("No changes added to the commit.");
+                System.exit(0);
+            }
             time = System.currentTimeMillis();
-            parentsSha = perSha;
+            parentsSha.add(perSha);
+            trackedFiles = new HashMap<>(perCommit.trackedFiles);
+            if (remove != null) {
+                for (String rm : remove) {
+                    trackedFiles.remove(rm);
+                }
+            }
+            trackedFiles.putAll(files);
         }
         sha = genSha();
         genBlob(files);
         saveCommit();
     }
 
-    public Commit(String m, String perSha, HashMap<String, String> files) {
-        message = m;
-        trackedFiles = files;
-        parentsSha = new ArrayList<>();
-        if (Objects.equals(perSha, "")) {
-            time = 0;
-        } else {
-            time = System.currentTimeMillis();
-            parentsSha.add(perSha);
-        }
-        sha = genSha();
-        genBlob(files);
-        saveCommit();
+    // 重载的构造函数1
+    public Commit(String m, List<String> perShaList, HashMap<String, String> files, HashSet<String> remove) {
+        this(m, perShaList, null, files, remove);
+    }
+
+    // 重载的构造函数2
+    public Commit(String m, String perSha, HashMap<String, String> files, HashSet<String> remove) {
+        this(m, null, perSha, files, remove);
     }
 
     public static Commit fromFile(String commitSha) {
@@ -156,7 +164,7 @@ public class Commit implements Serializable {
 
     public boolean fileChanged(File file) {
         String curSha = Base.getFileSHA(file);
-        return trackedFiles.getOrDefault(file.toString(), "").equals(curSha);
+        return !trackedFiles.getOrDefault(file.toString(), "").equals(curSha);
     }
 
     public String getFileSha(File file) {
