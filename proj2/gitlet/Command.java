@@ -5,28 +5,41 @@ import java.util.*;
 
 public class Command {
 
-    static void init() throws IOException {
+    static void init() {
         Repository.initDirFile();
-        StagingArea stagingArea = new StagingArea();
-        Commit commit = new Commit("initial commit", "", stagingArea.getTrackedFiles());
-        Branch branch = new Branch("master", commit.getSha());
-        Head head = new Head(commit.getSha(), branch.getCurrentBranchName());
+        StagingArea stagingArea = null;
+        try {
+            stagingArea = new StagingArea();
+            Commit commit = new Commit("initial commit", "", stagingArea.getTrackedFiles());
+            Branch branch = new Branch("master", commit.getSha());
+            Head head = new Head(commit.getSha(), branch.getCurrentBranchName());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    static void add(String filePath) throws IOException {
+    static void add(String filePath) {
         StagingArea stagingArea = StagingArea.fromFile();
-        stagingArea.add(filePath);
+        try {
+            stagingArea.add(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Commit changes
-    static void commit(String message) throws IOException {
+    static void commit(String message) {
         StagingArea stagingArea = StagingArea.fromFile();
         Head head = Head.fromFile();
         Commit commit = head.getCommit();
         Commit newCommit = new Commit(message, commit.getSha(), stagingArea.getTrackedFiles());
-        head.setCommitSHA(newCommit.getSha());
-        Branch branch = Branch.fromFile();
-        branch.setCurrentCommit(newCommit.getSha());
+        try {
+            head.setCommitSHA(newCommit.getSha());
+            Branch branch = Branch.fromFile();
+            branch.setCurrentCommit(newCommit.getSha());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Show commit logs
@@ -127,7 +140,7 @@ public class Command {
         }
     }
 
-    public static void handleBranchCheckout(Branch branch, Head head, String branchName) throws IOException {
+    public static void handleBranchCheckout(Branch branch, Head head, String branchName) {
         if (branchName.equals(branch.getCurrentBranchName())) {
             System.out.println("No need to checkout the current branch.");
             return;
@@ -138,11 +151,15 @@ public class Command {
         }
         Commit targetCommit = branch.getBranchCommit(branchName);
         branch.getCurrentCommit().rest(targetCommit);
-        head.setCommitSHA(targetCommit.getSha());
-        branch.checkout(branchName);
+        try {
+            head.setCommitSHA(targetCommit.getSha());
+            branch.checkout(branchName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static void recoverFile(Commit curCommit, String filePath) throws IOException {
+    public static void recoverFile(Commit curCommit, String filePath) {
         String fileSHA = curCommit.getFileSha(filePath);
         if (fileSHA != null) {
             Blob fileBlob = Blob.fromFile(fileSHA);
@@ -152,7 +169,7 @@ public class Command {
         }
     }
 
-    public static void recoverFileFromCommit(String commitSHA, String filePath) throws IOException {
+    public static void recoverFileFromCommit(String commitSHA, String filePath) {
         Commit targetCommit = Commit.fromFile(commitSHA);
         if (targetCommit == null) {
             System.out.println("No commit with that id exists.");
@@ -162,10 +179,14 @@ public class Command {
     }
 
     // Create a new branch
-    static void branch(String branchName) throws IOException {
+    static void branch(String branchName) {
         Head head = Head.fromFile();
         Branch branch = Branch.fromFile();
-        branch.newBranch(branchName, head.getCommit().getSha());
+        try {
+            branch.newBranch(branchName, head.getCommit().getSha());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Remove a branch
@@ -175,7 +196,7 @@ public class Command {
     }
 
     // Reset to a specific commit
-    static void reset(String commitSHA) throws IOException {
+    static void reset(String commitSHA) {
         Commit commit = Commit.fromFile(commitSHA);
         if (commit == null) {
             System.out.println("No commit with that id exists.");
@@ -184,19 +205,35 @@ public class Command {
         Head head = Head.fromFile();
         Commit curCommit = head.getCommit();
         curCommit.rest(commit);
-        head.setCommitSHA(commitSHA);
-        StagingArea stagingArea = StagingArea.fromFile();
-        stagingArea.cleanStagingArea();
+        try {
+            head.setCommitSHA(commitSHA);
+            StagingArea stagingArea = StagingArea.fromFile();
+            stagingArea.cleanStagingArea();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Remove a file from the working directory and staging area
-    static void rm(String filePath) throws IOException {
+    static void rm(String filePath) {
         StagingArea stagingArea = StagingArea.fromFile();
-        stagingArea.rm(filePath);
+        try {
+            stagingArea.rm(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Merge a branch into the current branch
     static void merge(String branchName) {
-        // TODO: Implement branch merge logic
+        Head head = Head.fromFile();
+        Branch branch = Branch.fromFile();
+        Commit current = branch.getCurrentCommit();
+        Commit target = branch.getBranchCommit(branchName);
+        try {
+            Branch.merge(current.getSha(), target.getSha(), branch.getCurrentBranchName(), branchName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
