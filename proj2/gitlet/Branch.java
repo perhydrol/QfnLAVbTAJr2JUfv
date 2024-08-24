@@ -192,8 +192,8 @@ public class Branch implements Serializable {
         if (tarSHA != null && !tarSHA.isEmpty()) {
             tarBlob = Blob.fromFile(tarSHA);
         }
-        String curCode = curBlob != null ? curBlob.getCode() : "\n";
-        String tarCode = tarBlob != null ? tarBlob.getCode() : "\n";
+        String curCode = curBlob != null ? curBlob.getCode() : "";
+        String tarCode = tarBlob != null ? tarBlob.getCode() : "";
         String contact = "<<<<<<< HEAD\n" + curCode + "=======\n" + tarCode + ">>>>>>>\n";
         File file = Base.stringToFile(item);
         Utils.writeContents(file, contact);

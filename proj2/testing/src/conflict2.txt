@@ -1,4 +1,4 @@
 <<<<<<< HEAD
-Another wug.=======
-
+Another wug.
+=======
 >>>>>>>
