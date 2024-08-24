@@ -186,10 +186,10 @@ public class Branch implements Serializable {
     private static void handleMergeConflict(String item, String curSHA, String tarSHA) {
         Blob curBlob = null;
         Blob tarBlob = null;
-        if (curSHA != null || !curSHA.isEmpty()) {
+        if (curSHA != null && !curSHA.isEmpty()) {
             curBlob = Blob.fromFile(curSHA);
         }
-        if (tarSHA != null || !tarSHA.isEmpty()) {
+        if (tarSHA != null && !tarSHA.isEmpty()) {
             tarBlob = Blob.fromFile(tarSHA);
         }
         String curCode = curBlob != null ? curBlob.getCode() : "\n";
