@@ -175,7 +175,6 @@ public class Branch implements Serializable {
             } else if (isConflict) {
                 System.out.println("Encountered a merge conflict.");
                 handleMergeConflict(item, curSHA, tarSHA);
-                return;
             } else if (isUntrackedFileInTheWay) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
@@ -185,11 +184,19 @@ public class Branch implements Serializable {
     }
 
     private static void handleMergeConflict(String item, String curSHA, String tarSHA) {
-        Blob curBlob = Blob.fromFile(curSHA);
-        Blob tarBlob = Blob.fromFile(tarSHA);
-        String contect = "<<<<<<< HEAD\n" + curBlob.getCode() + "=======\n" + tarBlob.getCode() + ">>>>>>>\n";
+        Blob curBlob = null;
+        Blob tarBlob = null;
+        if (curSHA != null || !curSHA.isEmpty()) {
+            curBlob = Blob.fromFile(curSHA);
+        }
+        if (tarSHA != null || !tarSHA.isEmpty()) {
+            tarBlob = Blob.fromFile(tarSHA);
+        }
+        String curCode = curBlob != null ? curBlob.getCode() : "\n";
+        String tarCode = tarBlob != null ? tarBlob.getCode() : "\n";
+        String contact = "<<<<<<< HEAD\n" + curCode + "=======\n" + tarCode + ">>>>>>>\n";
         File file = Base.stringToFile(item);
-        Utils.writeContents(file, contect);
+        Utils.writeContents(file, contact);
     }
 
     private void saveBranch() throws IOException {
