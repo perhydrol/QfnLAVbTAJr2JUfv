@@ -3,10 +3,7 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Branch implements Serializable {
     private class Node implements Serializable {
@@ -131,6 +128,10 @@ public class Branch implements Serializable {
         }
         Set<String> items = new HashSet<>(curFiles.keySet());
         items.addAll(targetFiles.keySet());
+        List<String> filesInDir = Utils.plainFilenamesIn(Repository.CWD);
+        if (filesInDir != null) {
+            items.addAll(filesInDir);
+        }
         for (String item : items) {
             String tarSHA = targetFiles.getOrDefault(item, "");
             String curSHA = curFiles.getOrDefault(item, "");
@@ -161,23 +162,26 @@ public class Branch implements Serializable {
                     || isFileOnlyInGivenBranch || isUnmodifiedInCurrentAndAbsentInGiven;
             // 未跟踪文件
             boolean unTrackedFile = !(stagingArea.getTrackedFiles().containsKey(item) || currentCommit.fileExits(item));
+            if (unTrackedFile && Base.stringToFile(item).exists()) {
+                willChange = willChange && !Base.getFileSHA(item).equals(tarSHA);
+            }
             // 存在未跟踪文件且会被合并覆盖或删除
             boolean isUntrackedFileInTheWay = unTrackedFile && willChange;
             if (isModifiedInCurrentBranchOnly
                     || isModifiedInSameWayInBothBranches || isFileOnlyInCurrentBranch || isUnmodifiedInGivenAndAbsentInCurrent) {
                 continue;
+            } else if (isUntrackedFileInTheWay) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                return;
+            } else if (isConflict) {
+                System.out.println("Encountered a merge conflict.");
+                handleMergeConflict(item, curSHA, tarSHA);
             } else if (!tarSHA.isEmpty() && (isModifiedInGivenBranchOnly || isFileOnlyInGivenBranch)) {
                 Blob file = Blob.fromFile(tarSHA);
                 file.recovery();
                 stagingArea.add(file.getFilePath());
             } else if (isUnmodifiedInCurrentAndAbsentInGiven) {
                 stagingArea.rm(item);
-            } else if (isConflict) {
-                System.out.println("Encountered a merge conflict.");
-                handleMergeConflict(item, curSHA, tarSHA);
-            } else if (isUntrackedFileInTheWay) {
-                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                return;
             }
         }
         Command.commit("Merged " + targetBranchName + " into " + currentBranchName + ".");

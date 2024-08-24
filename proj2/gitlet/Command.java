@@ -257,8 +257,21 @@ public class Command {
     static void merge(String branchName) {
         Head head = Head.fromFile();
         Branch branch = Branch.fromFile();
+        if (!branch.isExited(branchName)) {
+            System.out.println("A branch with that name does not exist.");
+            return;
+        }
         Commit current = branch.getCurrentCommit();
         Commit target = branch.getBranchCommit(branchName);
+        StagingArea stagingArea = StagingArea.fromFile();
+        if (branch.getCurrentBranchName().equals(branchName)) {
+            System.out.println("Cannot merge a branch with itself.");
+            return;
+        }
+        if (!stagingArea.getTrackedFiles().isEmpty()) {
+            System.out.println("You have uncommitted changes.");
+            return;
+        }
         try {
             Branch.merge(current.getSha(), target.getSha(), branch.getCurrentBranchName(), branchName);
         } catch (IOException e) {
