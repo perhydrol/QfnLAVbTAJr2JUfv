@@ -161,8 +161,9 @@ public class Branch implements Serializable {
             boolean willChange = isModifiedInGivenBranchOnly
                     || isFileOnlyInGivenBranch || isUnmodifiedInCurrentAndAbsentInGiven;
             // 未跟踪文件
-            boolean unTrackedFile = !(stagingArea.getTrackedFiles().containsKey(item) || currentCommit.fileExits(item));
-            if (unTrackedFile && Base.stringToFile(item).exists()) {
+            boolean unTrackedFile = !(stagingArea.getTrackedFiles().containsKey(item) || currentCommit.fileExits(item))
+                    && Base.stringToFile(item).exists();
+            if (unTrackedFile) {
                 willChange = willChange && !Base.getFileSHA(item).equals(tarSHA);
             }
             // 存在未跟踪文件且会被合并覆盖或删除
