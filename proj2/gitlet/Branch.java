@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class Branch implements Serializable {
     private class Node implements Serializable {
@@ -18,12 +19,12 @@ public class Branch implements Serializable {
         }
     }
 
-    private HashMap<String, Node> branches;
+    private TreeMap<String, Node> branches;
     private Node current;
 
     public Branch(String branchName, String commitSha) throws IOException {
         Node node = new Node(commitSha, branchName);
-        branches = new HashMap<>();
+        branches = new TreeMap<>();
         branches.put(branchName, node);
         current = node;
         saveBranch();
@@ -51,8 +52,8 @@ public class Branch implements Serializable {
         return current.branchName;
     }
 
-    public HashMap<String, String> getBranches() {
-        HashMap<String, String> branchCommit = new HashMap<>();
+    public TreeMap<String, String> getBranches() {
+        TreeMap<String, String> branchCommit = new TreeMap<>();
         for (String name : branches.keySet()) {
             branchCommit.put(name, branches.get(name).commitSha);
         }
@@ -79,13 +80,14 @@ public class Branch implements Serializable {
         setCurrentCommit(commit.getSha());
     }
 
-    public void rmBranch(String branchName) {
+    public void rmBranch(String branchName) throws IOException {
         if (isExited(branchName)) {
             if (getCurrentBranchName().equals(branchName)) {
                 System.out.println("Cannot remove the current branch.");
                 return;
             }
             branches.remove(branchName);
+            saveBranch();
         } else {
             System.out.println("A branch with that name does not exist.");
             return;

@@ -69,7 +69,7 @@ public class Command {
 
     // Show global commit logs
     static void globalLog() {
-        HashMap<String, String> branchCommit = Branch.fromFile().getBranches();
+        TreeMap<String, String> branchCommit = Branch.fromFile().getBranches();
         List<String> visited = new ArrayList<>();
         for (String branchName : branchCommit.keySet()) {
             String parent = branchCommit.get(branchName);
@@ -90,8 +90,9 @@ public class Command {
 
     // Find commits by message
     static void find(String commitMessage) {
-        HashMap<String, String> branchCommit = Branch.fromFile().getBranches();
+        TreeMap<String, String> branchCommit = Branch.fromFile().getBranches();
         List<String> visited = new ArrayList<>();
+        boolean successful = false;
         for (String branchName : branchCommit.keySet()) {
             String parent = branchCommit.get(branchName);
             while (true) {
@@ -99,6 +100,7 @@ public class Command {
                 if (!visited.contains(current.getSha())) {
                     if (current.getMessage().equals(commitMessage)) {
                         System.out.println(current.getSha());
+                        successful = true;
                     }
                     visited.add(current.getSha());
                 }
@@ -108,6 +110,9 @@ public class Command {
                     parent = current.getParentsSha().get(0);
                 }
             }
+        }
+        if (!successful) {
+            System.out.println("Found no commit with that message.");
         }
     }
 
@@ -196,6 +201,10 @@ public class Command {
     static void branch(String branchName) {
         Head head = Head.fromFile();
         Branch branch = Branch.fromFile();
+        if (branch.isExited(branchName)) {
+            System.out.println("A branch with that name already exists.");
+            return;
+        }
         try {
             branch.newBranch(branchName, head.getCommit().getSha());
         } catch (IOException e) {
@@ -206,7 +215,11 @@ public class Command {
     // Remove a branch
     static void rmBranch(String branchName) {
         Branch branch = Branch.fromFile();
-        branch.rmBranch(branchName);
+        try {
+            branch.rmBranch(branchName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Reset to a specific commit
@@ -223,6 +236,8 @@ public class Command {
             head.setCommitSHA(commitSHA);
             StagingArea stagingArea = StagingArea.fromFile();
             stagingArea.cleanStagingArea();
+            Branch branch = Branch.fromFile();
+            branch.setCurrentCommit(commitSHA);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

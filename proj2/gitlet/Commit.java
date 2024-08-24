@@ -7,8 +7,6 @@ import java.util.*;
 /**
  * Represents a gitlet commit object.
  * does at a high level.
- *
- * @author TODO
  */
 public class Commit implements Serializable {
     /*
