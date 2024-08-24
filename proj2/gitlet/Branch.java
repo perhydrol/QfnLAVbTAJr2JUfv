@@ -12,8 +12,10 @@ public class Branch implements Serializable {
     private class Node implements Serializable {
         String commitSha;
         String branchName;
+        String endCommitSha;
 
         Node(String commitSha, String branchName) {
+            this.endCommitSha = commitSha;
             this.commitSha = commitSha;
             this.branchName = branchName;
         }
@@ -60,6 +62,14 @@ public class Branch implements Serializable {
         return branchCommit;
     }
 
+    public TreeMap<String, String> getBranchesEndCommit() {
+        TreeMap<String, String> branchCommit = new TreeMap<>();
+        for (String name : branches.keySet()) {
+            branchCommit.put(name, branches.get(name).endCommitSha);
+        }
+        return branchCommit;
+    }
+
     public Commit getCurrentCommit() {
         return Commit.fromFile(current.commitSha);
     }
@@ -78,6 +88,16 @@ public class Branch implements Serializable {
 
     public void setCurrentCommit(Commit commit) throws IOException {
         setCurrentCommit(commit.getSha());
+    }
+
+    public void addCommit(String commitSha) throws IOException {
+        current.commitSha = commitSha;
+        current.endCommitSha = commitSha;
+        saveBranch();
+    }
+
+    public void addCommit(Commit commit) throws IOException {
+        addCommit(commit.getSha());
     }
 
     public void rmBranch(String branchName) throws IOException {

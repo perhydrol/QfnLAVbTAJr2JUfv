@@ -44,7 +44,7 @@ public class Command {
         try {
             head.setCommitSHA(newCommit.getSha());
             Branch branch = Branch.fromFile();
-            branch.setCurrentCommit(newCommit.getSha());
+            branch.addCommit(newCommit.getSha());
             stagingArea.cleanStagingArea();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -69,7 +69,7 @@ public class Command {
 
     // Show global commit logs
     static void globalLog() {
-        TreeMap<String, String> branchCommit = Branch.fromFile().getBranches();
+        TreeMap<String, String> branchCommit = Branch.fromFile().getBranchesEndCommit();
         List<String> visited = new ArrayList<>();
         for (String branchName : branchCommit.keySet()) {
             String parent = branchCommit.get(branchName);

@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static gitlet.Utils.join;
 
 public class StagingArea implements Serializable {
     private static final File STAGING_AREA = Repository.STAGING_AREA;
