@@ -133,8 +133,12 @@ public class Command {
         System.out.println("\n=== Untracked Files ===");
         List<String> allFiles = Utils.plainFilenamesIn(Repository.CWD.toString());
         allFiles.removeAll(stagingArea.getRemovalFiles());
-        allFiles.removeAll(stagingArea.getTrackedFiles().keySet());
-        allFiles.removeAll(stagingArea.getChangedFiles().keySet());
+        if (!stagingArea.getTrackedFiles().isEmpty()) {
+            allFiles.removeAll(stagingArea.getTrackedFiles().keySet());
+        }
+        if (!stagingArea.getChangedFiles().isEmpty()) {
+            allFiles.removeAll(stagingArea.getChangedFiles().keySet());
+        }
         for (String s : allFiles) {
             System.out.println(s);
         }
