@@ -115,6 +115,10 @@ public class Branch implements Serializable {
         Commit currentCommit = Commit.fromFile(currentSha);
         Commit targetCommit = Commit.fromFile(targetSha);
         Commit splitPointCommit = Commit.getSplitPoint(currentCommit, targetCommit);
+        if (splitPointCommit.getSha().equals(currentSha)) {
+            System.out.println("Current branch fast-forwarded.");
+            return;
+        }
         HashMap<String, String> splitFiles = splitPointCommit.getTrackedFiles();
         HashMap<String, String> curFiles = currentCommit.getTrackedFiles();
         HashMap<String, String> targetFiles = targetCommit.getTrackedFiles();
