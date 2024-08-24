@@ -156,7 +156,7 @@ public class Branch implements Serializable {
                     && curSHA.isEmpty()
                     && tarSHA.equals(splitSHA);
             // 文件在当前分支和给定分支中以不同方式修改（发生冲突）
-            boolean isConflict = !(curSHA.isEmpty() && tarSHA.isEmpty()) && !curSHA.equals(tarSHA);
+            boolean isConflict = !curSHA.equals(splitSHA) && !tarSHA.equals(splitSHA) && !curSHA.equals(tarSHA);
             boolean willChange = isModifiedInGivenBranchOnly
                     || isFileOnlyInGivenBranch || isUnmodifiedInCurrentAndAbsentInGiven;
             // 未跟踪文件
@@ -166,7 +166,7 @@ public class Branch implements Serializable {
             if (isModifiedInCurrentBranchOnly
                     || isModifiedInSameWayInBothBranches || isFileOnlyInCurrentBranch || isUnmodifiedInGivenAndAbsentInCurrent) {
                 continue;
-            } else if (isModifiedInGivenBranchOnly || isFileOnlyInGivenBranch) {
+            } else if (!tarSHA.isEmpty() && (isModifiedInGivenBranchOnly || isFileOnlyInGivenBranch)) {
                 Blob file = Blob.fromFile(tarSHA);
                 file.recovery();
                 stagingArea.add(file.getFilePath());
@@ -181,7 +181,7 @@ public class Branch implements Serializable {
                 return;
             }
         }
-        Command.commit("Merged " + currentBranchName + " into " + targetBranchName + ".");
+        Command.commit("Merged " + targetBranchName + " into " + currentBranchName + ".");
     }
 
     private static void handleMergeConflict(String item, String curSHA, String tarSHA) {

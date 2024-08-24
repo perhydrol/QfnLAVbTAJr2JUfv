@@ -102,7 +102,7 @@ public class Commit implements Serializable {
                 Commit commitA = Commit.fromFile(shaA);
                 if (commitA != null) {
                     for (String parentSHA : commitA.parentsSha) {
-                        if (visitedA.add(parentSHA)) {
+                        if (visitedA.add(shaA)) {
                             queueA.add(parentSHA);
                         }
                     }
@@ -116,7 +116,7 @@ public class Commit implements Serializable {
                 Commit commitB = Commit.fromFile(shaB);
                 if (commitB != null) {
                     for (String parentSHA : commitB.parentsSha) {
-                        if (visitedB.add(parentSHA)) {
+                        if (visitedB.add(shaB)) {
                             queueB.add(parentSHA);
                         }
                     }

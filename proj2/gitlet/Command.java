@@ -90,7 +90,7 @@ public class Command {
 
     // Find commits by message
     static void find(String commitMessage) {
-        TreeMap<String, String> branchCommit = Branch.fromFile().getBranches();
+        TreeMap<String, String> branchCommit = Branch.fromFile().getBranchesEndCommit();
         List<String> visited = new ArrayList<>();
         boolean successful = false;
         for (String branchName : branchCommit.keySet()) {
