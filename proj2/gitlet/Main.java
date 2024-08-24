@@ -21,8 +21,13 @@ public class Main {
         }
         String firstArg = args[0];
         if (firstArg.equals("init")) {
-            Command.init();
-            return;
+            if (Repository.GITLET_DIR.exists()) {
+                System.out.println("A Gitlet version-control system already exists in the current directory.");
+                return;
+            } else {
+                Command.init();
+                return;
+            }
         } else if (!Repository.GITLET_DIR.exists()) {
             System.out.println("Not in an initialized Gitlet directory.");
             return;
